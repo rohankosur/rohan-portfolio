@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Starfield from './Starfield';
-import Complex3D from './Complex3D';
+import Hero3DCore from './Hero3DCore';
+import Mini3DNode from './Mini3DNode';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -106,8 +107,8 @@ function App() {
       {/* Hero Section */}
       <section className="relative min-h-screen flex flex-col justify-center px-6 md:px-20 pt-32 overflow-hidden">
         {/* Complex 3D Parallax Graphic */}
-        <div className="absolute right-[-10%] md:right-0 top-1/4 md:top-1/2 md:-translate-y-1/2 w-[600px] h-[600px] pointer-events-none opacity-80 z-0">
-          <Complex3D />
+        <div className="absolute right-[-20%] md:right-[-10%] top-1/4 md:top-1/2 md:-translate-y-1/2 w-[800px] h-[800px] pointer-events-auto opacity-90 z-0 cursor-crosshair">
+          <Hero3DCore />
         </div>
 
         <div className="z-10 animate-up">
@@ -206,11 +207,8 @@ function App() {
               <span>2024</span>
             </div>
             
-            <div className="h-48 flex items-center justify-center mb-12 relative">
-               {/* Abstract Tech Graphic */}
-               <div className="w-32 h-32 border border-[var(--color-neon-cyan)]/30 rotate-45 flex items-center justify-center group-hover:rotate-90 transition-transform duration-700">
-                  <div className="w-16 h-16 bg-[var(--color-neon-cyan)]/20 animate-pulse"></div>
-               </div>
+            <div className="h-48 flex items-center justify-center mb-12 relative w-full pointer-events-auto">
+               <Mini3DNode color="#00f3ff" />
             </div>
 
             <h3 className="text-3xl font-black uppercase tracking-tight mb-4 group-hover:text-[var(--color-neon-cyan)] transition-colors">Habit Tracking PWA</h3>
@@ -231,12 +229,8 @@ function App() {
               <span>2023</span>
             </div>
             
-            <div className="h-48 flex items-center justify-center mb-12 relative">
-               {/* Abstract Tech Graphic */}
-               <div className="w-32 h-32 border border-[var(--color-neon-purple)]/30 rounded-full flex items-center justify-center">
-                  <div className="w-20 h-20 border border-[var(--color-neon-purple)]/60 rounded-full animate-ping opacity-20"></div>
-                  <div className="w-8 h-8 bg-[var(--color-neon-purple)] rounded-full glow-purple"></div>
-               </div>
+            <div className="h-48 flex items-center justify-center mb-12 relative w-full pointer-events-auto">
+               <Mini3DNode color="#b026ff" />
             </div>
 
             <h3 className="text-3xl font-black uppercase tracking-tight mb-4 group-hover:text-[var(--color-neon-purple)] transition-colors">TI-84 Toolchain</h3>
