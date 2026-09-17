@@ -187,7 +187,7 @@ function App() {
       </section>
 
       {/* Section 002 / ABOUT */}
-      <section id="about" className="py-32 px-6 md:px-20 border-t border-white/5 relative">
+      <section id="about" className="py-32 px-6 md:px-20 border-t border-white/5 relative z-10">
         <div className="flex justify-between items-center mb-16">
           <span className="section-label">002 / ABOUT</span>
           <span className="section-accent">a bit of context</span>
@@ -225,13 +225,13 @@ function App() {
       </section>
 
       {/* Section 003 / PROOF_OF_WORK */}
-      <section id="proof-of-work" className="py-32 px-6 md:px-20 border-t border-white/5 relative">
-        <div className="flex justify-between items-center mb-16">
+      <section id="proof-of-work" className="py-32 border-t border-white/5 relative z-10">
+        <div className="flex justify-between items-center mb-16 px-6 md:px-20">
           <span className="section-label">003 / PROOF_OF_WORK</span>
           <span className="section-accent">showing up, most days</span>
         </div>
 
-        <div className="animate-up flex flex-col md:flex-row justify-between mb-16 gap-8">
+        <div className="animate-up flex flex-col md:flex-row justify-between mb-16 gap-8 px-6 md:px-20">
           <div>
             <h2 className="text-6xl md:text-8xl font-black tracking-tighter text-white">618</h2>
             <p className="font-mono text-xs text-gray-400 tracking-widest mt-2 uppercase">COMMITS/YR</p>
@@ -247,21 +247,22 @@ function App() {
         </div>
 
         {/* GitHub contribution heatmap grid */}
-        <div className="w-full overflow-x-auto pb-4 opacity-90 animate-up">
+        <div className="w-full overflow-x-auto pb-4 opacity-100 animate-up">
           <div className="inline-grid grid-rows-7 grid-flow-col gap-1 w-max">
             {Array.from({ length: 364 }).map((_, i) => {
               const val = (Math.sin(i * 0.37) * 0.4 + Math.sin(i * 1.83) * 0.3 + Math.cos(i * 0.08) * 0.3 + 1) / 2;
-              let bg = '#161b22';
-              if (val > 0.82) bg = '#39d353';
-              else if (val > 0.68) bg = '#26a641';
-              else if (val > 0.52) bg = '#006d32';
-              else if (val > 0.35) bg = '#0e4429';
+              let bg = 'rgba(255,255,255,0.05)';
+              let shadow = 'none';
+              if (val > 0.85) { bg = 'var(--color-neon-cyan)'; shadow = '0 0 10px var(--color-neon-cyan)'; }
+              else if (val > 0.65) { bg = 'var(--color-neon-purple)'; shadow = '0 0 10px var(--color-neon-purple)'; }
+              else if (val > 0.45) { bg = 'rgba(255, 0, 255, 0.4)'; }
+              else if (val > 0.25) { bg = 'rgba(0, 255, 255, 0.15)'; }
 
               return (
                 <div
                   key={i}
-                  className="w-3 h-3 rounded-[2px] transition-all duration-200 hover:scale-125"
-                  style={{ backgroundColor: bg }}
+                  className="w-3 h-3 rounded-[2px] transition-all duration-200 hover:scale-125 hover:z-10 relative cursor-none"
+                  style={{ backgroundColor: bg, boxShadow: shadow }}
                 />
               );
             })}
@@ -270,7 +271,7 @@ function App() {
       </section>
 
       {/* Section 004 / TOOLKIT */}
-      <section id="toolkit" className="py-32 px-6 md:px-20 border-t border-white/5 relative">
+      <section id="toolkit" className="py-32 px-6 md:px-20 border-t border-white/5 relative z-10">
         <div className="flex justify-between items-center mb-16">
           <span className="section-label">004 / TOOLKIT</span>
           <span className="section-accent">tools I reach for</span>
@@ -394,7 +395,7 @@ function App() {
       </section>
 
       {/* Section 005 / EXPERIENCE */}
-      <section id="experience" className="py-32 px-6 md:px-20 border-t border-white/5 relative">
+      <section id="experience" className="py-32 px-6 md:px-20 border-t border-white/5 relative z-10">
         <div className="flex justify-between items-center mb-16">
           <span className="section-label">005 / EXPERIENCE</span>
           <span className="section-accent">the route so far</span>
@@ -474,7 +475,7 @@ function App() {
       </section>
 
       {/* Section 006 / WORK */}
-      <section id="work" className="py-32 px-6 md:px-20 border-t border-white/5">
+      <section id="work" className="py-32 px-6 md:px-20 border-t border-white/5 relative z-10">
         <div className="flex justify-between items-center mb-16">
           <span className="section-label">006 / WORK</span>
           <span className="section-accent">pinned repositories</span>
@@ -560,7 +561,7 @@ function App() {
       </section>
 
       {/* Section 007 / OFF-SCREEN */}
-      <section id="off-screen" className="py-32 border-t border-white/5 relative overflow-hidden">
+      <section id="off-screen" className="py-32 px-6 md:px-20 border-t border-white/5 relative z-10 overflow-hidden">
         <div className="px-6 md:px-20 flex justify-between items-center mb-16">
           <span className="section-label">007 / OFF-SCREEN</span>
           <span className="section-accent">life beyond the editor</span>
