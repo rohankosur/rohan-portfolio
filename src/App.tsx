@@ -102,20 +102,49 @@ function App() {
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex flex-col justify-center px-6 md:px-20 pt-32">
+        {/* HUD Corner Accents */}
+        <div className="absolute top-24 left-6 w-4 h-4 border-t-2 border-l-2 border-[var(--color-neon-cyan)] opacity-50"></div>
+        <div className="absolute top-24 right-6 w-4 h-4 border-t-2 border-r-2 border-[var(--color-neon-cyan)] opacity-50"></div>
+        <div className="absolute bottom-6 left-6 w-4 h-4 border-b-2 border-l-2 border-[var(--color-neon-cyan)] opacity-50"></div>
+        <div className="absolute bottom-6 right-6 w-4 h-4 border-b-2 border-r-2 border-[var(--color-neon-cyan)] opacity-50"></div>
+
+        {/* 3D Core */}
         <div className="absolute right-[-30%] md:right-[-5%] top-1/4 md:top-1/2 md:-translate-y-1/2 w-[80vw] h-[80vw] max-w-[900px] max-h-[900px] pointer-events-auto opacity-90 z-0 cursor-crosshair">
           <Hero3DCore />
         </div>
 
-        <div className="z-10 animate-up">
-          <h1 className="text-[12vw] md:text-[10vw] font-black leading-[0.85] tracking-tighter uppercase mb-0">ROHAN</h1>
-          <h1 className="text-[12vw] md:text-[10vw] font-black leading-[0.85] tracking-tighter uppercase text-outline mb-12">KOSUR</h1>
+        {/* Left Side Content */}
+        <div className="z-10 animate-up relative">
+          <h1 className="text-[12vw] md:text-[10vw] font-black leading-[0.85] tracking-tighter uppercase mb-0 text-white glow-cyan">ROHAN</h1>
+          <h1 className="text-[12vw] md:text-[10vw] font-black leading-[0.85] tracking-tighter uppercase text-outline-neon mb-12">KOSUR</h1>
           
-          <div className="max-w-xl border-l border-[var(--color-neon-cyan)]/30 pl-6 relative">
+          <div className="max-w-xl border-l border-[var(--color-neon-cyan)]/50 pl-6 relative">
+            <div className="absolute -left-1 top-0 w-2 h-2 rounded-full bg-[var(--color-neon-cyan)] glow-cyan animate-ping"></div>
             <div className="absolute -left-1 top-0 w-2 h-2 rounded-full bg-[var(--color-neon-cyan)] glow-cyan"></div>
-            <p className="text-xl md:text-2xl font-light leading-relaxed text-gray-300">
+            <p className="text-xl md:text-2xl font-light leading-relaxed text-gray-200">
               architecting resilient infrastructure and <span className="font-calligraphy text-[var(--color-neon-cyan)] glow-cyan">deploying</span> full-stack analytical engines.
             </p>
           </div>
+        </div>
+
+        {/* Floating Data Feed */}
+        <div className="absolute top-1/3 left-2/3 hidden md:flex flex-col gap-1 font-mono-tech text-[8px] text-[var(--color-neon-purple)] opacity-70 border-l border-[var(--color-neon-purple)]/50 pl-2">
+          <span className="animate-pulse">SYS.CORE.ACTIVE // RUNNING</span>
+          <span>LATENCY: 12ms</span>
+          <span>MEM: 0x4F9A</span>
+          <div className="h-px w-16 bg-[var(--color-neon-purple)]/50 mt-1"></div>
+        </div>
+
+        {/* Bottom Micro Copy */}
+        <div className="absolute bottom-10 left-12 md:left-24 font-mono-tech text-[9px] tracking-widest text-gray-400 flex flex-col gap-2">
+          <span className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-[var(--color-neon-cyan)] rounded-full glow-cyan"></span>
+            STATUS: ACTIVE [UCONN SCHOOL OF BUSINESS]
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-[var(--color-neon-purple)] rounded-full glow-purple"></span>
+            INIT: 180 MATH LLC [FOUNDER]
+          </span>
         </div>
       </section>
 
@@ -166,7 +195,7 @@ function App() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-0 border border-white/10 bg-[#0a0a0a] animate-up">
           
-          <div className="p-8 border-b md:border-r md:border-b-0 lg:border-b border-white/10 group relative overflow-hidden">
+          <div className="p-8 border-b md:border-r md:border-b-0 lg:border-b border-white/10 group relative overflow-hidden hover:box-glow-purple transition-all duration-300 hover:z-20">
             <div className="absolute -right-10 -top-10 w-32 h-32 opacity-20 pointer-events-none"><Mini3DNode color="#00f3ff"/></div>
             <div className="flex justify-between items-start mb-6 relative z-10">
               <h3 className="text-2xl font-black uppercase">Languages</h3>
@@ -180,7 +209,7 @@ function App() {
             </div>
           </div>
 
-          <div className="p-8 border-b lg:border-r border-white/10 group relative overflow-hidden">
+          <div className="p-8 border-b lg:border-r border-white/10 group relative overflow-hidden hover:box-glow-purple transition-all duration-300 hover:z-20">
             <div className="absolute -right-10 -bottom-10 w-32 h-32 opacity-20 pointer-events-none"><Mini3DNode color="#b026ff"/></div>
             <div className="flex justify-between items-start mb-6 relative z-10">
               <h3 className="text-2xl font-black uppercase">Frontend</h3>
@@ -291,7 +320,7 @@ function App() {
             { name: "routine-streak-pwa", desc: "High-contrast performance optimizer tracking routines via bitmask arithmetic and low-latency calendar.", tags: ["JavaScript"], color: "#f1e05a" },
             { name: "supercommunicators-app", desc: "Python app analyzing communication psychology and conversation dynamics using NLP.", tags: ["Python"], color: "#3572A5" }
           ].map((repo, i) => (
-            <div key={i} className="border border-white/10 bg-[#0a0a0a] p-6 hover:border-white/30 transition-colors flex flex-col">
+            <div key={i} className="border border-white/10 bg-[#0a0a0a] p-6 hover:box-glow-cyan transition-all duration-300 flex flex-col">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-4 h-4 bg-white/10 rounded-sm flex items-center justify-center">
                   <svg className="w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 16 16"><path fillRule="evenodd" d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25 0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"></path></svg>
