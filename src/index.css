@@ -73,9 +73,4 @@ body::before {
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-neon-cyan); box-shadow: 0 0 10px var(--color-neon-cyan); }
 
-.preserve-3d {
-  transform-style: preserve-3d;
-}
-.perspective-\\[1200px\\] {
-  perspective: 1200px;
-}
+
