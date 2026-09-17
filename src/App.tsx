@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Starfield from './Starfield';
 import Hero3DCore from './Hero3DCore';
 import Mini3DNode from './Mini3DNode';
+import ScrollRibbon from './ScrollRibbon';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -66,6 +67,7 @@ function App() {
   return (
     <div className="relative min-h-screen selection:bg-[var(--color-neon-purple)] selection:text-white pb-20 overflow-x-hidden">
       <Starfield />
+      <ScrollRibbon />
       
       {/* Custom Cursor */}
       <div ref={cursorDotRef} className="fixed top-0 left-0 w-1.5 h-1.5 bg-[var(--color-neon-cyan)] rounded-full pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 glow-cyan"></div>
