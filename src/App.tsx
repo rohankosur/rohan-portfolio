@@ -30,8 +30,26 @@ function App() {
         gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.15, ease: 'power2.out' });
         gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0 });
       };
+      
+      const onMouseEnter = () => gsap.to(cursor, { scale: 1.5, opacity: 0.8, duration: 0.2 });
+      const onMouseLeave = () => gsap.to(cursor, { scale: 1, opacity: 0.5, duration: 0.2 });
+
       window.addEventListener('mousemove', onMouseMove);
-      return () => window.removeEventListener('mousemove', onMouseMove);
+      
+      // Attach hover listeners to interactable elements
+      const interactables = document.querySelectorAll('a, button, .group');
+      interactables.forEach(el => {
+        el.addEventListener('mouseenter', onMouseEnter);
+        el.addEventListener('mouseleave', onMouseLeave);
+      });
+
+      return () => {
+        window.removeEventListener('mousemove', onMouseMove);
+        interactables.forEach(el => {
+          el.removeEventListener('mouseenter', onMouseEnter);
+          el.removeEventListener('mouseleave', onMouseLeave);
+        });
+      };
     }
   }, []);
 
@@ -67,9 +85,24 @@ function App() {
         </div>
       </nav>
 
+      {/* Top Ticker Marquee */}
+      <div className="fixed top-[65px] left-0 w-full border-b border-white/5 py-2 overflow-hidden flex gap-8 font-mono-tech text-[8px] uppercase tracking-widest text-gray-500 z-30 bg-[var(--color-dark)]/80 backdrop-blur-sm whitespace-nowrap">
+        <div className="animate-[marquee_20s_linear_infinite] flex gap-12">
+          <span><span className="text-[var(--color-neon-purple)]">●</span> ALGORITHMIC RISK ASSESSMENT</span>
+          <span><span className="text-[var(--color-neon-cyan)]">●</span> SYSTEM ARCHITECTURE</span>
+          <span><span className="text-[var(--color-neon-purple)]">●</span> DATA-DRIVEN STRATEGY</span>
+          <span><span className="text-[var(--color-neon-cyan)]">●</span> UCONN FINANCE</span>
+          
+          <span><span className="text-[var(--color-neon-purple)]">●</span> ALGORITHMIC RISK ASSESSMENT</span>
+          <span><span className="text-[var(--color-neon-cyan)]">●</span> SYSTEM ARCHITECTURE</span>
+          <span><span className="text-[var(--color-neon-purple)]">●</span> DATA-DRIVEN STRATEGY</span>
+          <span><span className="text-[var(--color-neon-cyan)]">●</span> UCONN FINANCE</span>
+        </div>
+      </div>
+
       {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col justify-center px-6 md:px-20 pt-32 overflow-hidden">
-        <div className="absolute right-[-20%] md:right-[-10%] top-1/4 md:top-1/2 md:-translate-y-1/2 w-[800px] h-[800px] pointer-events-auto opacity-90 z-0 cursor-crosshair">
+      <section className="relative min-h-screen flex flex-col justify-center px-6 md:px-20 pt-32">
+        <div className="absolute right-[-30%] md:right-[-5%] top-1/4 md:top-1/2 md:-translate-y-1/2 w-[80vw] h-[80vw] max-w-[900px] max-h-[900px] pointer-events-auto opacity-90 z-0 cursor-crosshair">
           <Hero3DCore />
         </div>
 
@@ -312,6 +345,14 @@ function App() {
           <p className="mt-4 opacity-30 text-[8px] uppercase">© {new Date().getFullYear()} ROHAN KOSUR.</p>
         </div>
       </footer>
+
+      {/* Global CSS for Marquee */}
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+      `}</style>
     </div>
   );
 }
