@@ -318,7 +318,7 @@ function App() {
           </div>
 
           {/* AI / ML */}
-          <div className="p-8 border-b border-white/10 group relative overflow-hidden hover:box-glow-cyan transition-all duration-300">
+          <div className="p-8 border-b border-white/10 group relative overflow-hidden hover:box-glow-cyan hover-lift transition-all duration-300">
             <div className="absolute -right-8 -top-8 w-28 h-28 opacity-15 pointer-events-none">
               <Mini3DNode color="#b026ff" />
             </div>
@@ -522,7 +522,7 @@ function App() {
           ].map((repo) => (
             <div
               key={repo.name}
-              className="border border-white/10 bg-[var(--color-surface)] p-6 hover:box-glow-cyan transition-all duration-300 flex flex-col group"
+              className="border border-white/10 bg-[var(--color-surface)] p-6 hover:box-glow-cyan hover-lift transition-all duration-300 flex flex-col group"
             >
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-5 h-5 bg-white/10 rounded-sm flex items-center justify-center shrink-0">
