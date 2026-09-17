@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@1,400;1,600&family=JetBrains+Mono:wght@100..800&display=swap');
+@import "tailwindcss";
+
+:root {
+  --color-neon-cyan: #00f3ff;
+  --color-neon-purple: #b026ff;
+  --color-dark: #050505;
+  --color-off-white: #f4f4f0;
+}
+
+body {
+  background-color: var(--color-dark);
+  color: var(--color-off-white);
+  font-family: 'Space Grotesk', sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  cursor: none;
+  background-image: 
+    linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Subtle noise overlay for technical realism */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.font-calligraphy {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+}
+
+.font-mono-tech {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(244, 244, 240, 0.7);
+}
+
+.text-outline-neon {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-neon-cyan);
+  text-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+}
+
+.glow-cyan {
+  text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+}
+
+.glow-purple {
+  text-shadow: 0 0 10px rgba(176, 38, 255, 0.7);
+}
+
+.orbit-ring {
+  border: 1px solid rgba(0, 243, 255, 0.2);
+  border-radius: 50%;
+  position: absolute;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-dark); border-left: 1px solid rgba(255,255,255,0.05); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-neon-cyan); box-shadow: 0 0 10px var(--color-neon-cyan); }
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.perspective-\\[1200px\\] {
+  perspective: 1200px;
+}
