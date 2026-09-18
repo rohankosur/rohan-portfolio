@@ -89,38 +89,41 @@ const TesseractIllusion = () => {
 
 /* ─── Artisanal Painting Frame ─── */
 const PaintingFrame = () => {
-  const frameRef = useRef<THREE.Group>(null);
   const outerRing = useRef<THREE.Mesh>(null);
   const midRing = useRef<THREE.Mesh>(null);
   const innerRing = useRef<THREE.Mesh>(null);
   const mouse = useRef({ x: 0, y: 0 });
 
   useFrame((state) => {
-    if (!frameRef.current || !outerRing.current || !midRing.current || !innerRing.current) return;
+    if (!outerRing.current || !midRing.current || !innerRing.current) return;
     const t = state.clock.getElapsedTime();
     
-    // Smooth mouse interpolation
-    mouse.current.x += (state.pointer.x - mouse.current.x) * 0.1;
-    mouse.current.y += (state.pointer.y - mouse.current.y) * 0.1;
-
-    // Base subtle rotation for the whole group
-    frameRef.current.rotation.y = mouse.current.x * 0.2 + Math.sin(t * 0.2) * 0.1;
-    frameRef.current.rotation.x = -mouse.current.y * 0.2 + Math.cos(t * 0.3) * 0.05;
-
-    // Extreme Parallax Translation for the rings (moving side to side)
-    // The outermost ring moves the most, creating huge depth
-    outerRing.current.position.x = mouse.current.x * 1.5;
-    outerRing.current.position.y = mouse.current.y * 1.5;
+    // Incredibly smooth lerp for mouse coordinates
+    // Convert pointer to a desired rotation angle (approx 45 degrees max)
+    const targetX = state.pointer.x * (Math.PI / 4);
+    const targetY = state.pointer.y * (Math.PI / 4);
     
-    midRing.current.position.x = mouse.current.x * 0.8;
-    midRing.current.position.y = mouse.current.y * 0.8;
+    mouse.current.x = THREE.MathUtils.lerp(mouse.current.x, targetX, 0.03);
+    mouse.current.y = THREE.MathUtils.lerp(mouse.current.y, targetY, 0.03);
+
+    // Gyroscopic Orbital Effect
+    // The rings rotate around the center, responding to the mouse but maintaining an orbital flow
     
-    innerRing.current.position.x = mouse.current.x * 0.2;
-    innerRing.current.position.y = mouse.current.y * 0.2;
+    // Outer ring: dramatic follow
+    outerRing.current.rotation.y = mouse.current.x * 1.2 + Math.sin(t * 0.2) * 0.1;
+    outerRing.current.rotation.x = -mouse.current.y * 1.2 + Math.cos(t * 0.3) * 0.05;
+    
+    // Mid ring: inverted/counter-orbit follow for a complex mechanical feel
+    midRing.current.rotation.y = -mouse.current.x * 0.6 + Math.sin(t * 0.3 + 1) * 0.2;
+    midRing.current.rotation.x = mouse.current.y * 0.6 + Math.cos(t * 0.4 + 1) * 0.1;
+    
+    // Inner ring: stable continuous orbit with slight mouse influence
+    innerRing.current.rotation.y = mouse.current.x * 0.3 + t * 0.4;
+    innerRing.current.rotation.x = -mouse.current.y * 0.3 + Math.sin(t * 0.2) * 0.2;
   });
 
   return (
-    <group ref={frameRef}>
+    <group>
       {/* Outer heavy frame */}
       <mesh ref={outerRing}>
         <boxGeometry args={[6.5, 6.5, 0.5]} />
@@ -128,12 +131,12 @@ const PaintingFrame = () => {
       </mesh>
       
       {/* Inner intricate frame rails */}
-      <mesh ref={midRing} position={[0, 0, 0.2]}>
-        <boxGeometry args={[6.2, 6.2, 0.1]} />
+      <mesh ref={midRing}>
+        <boxGeometry args={[5.5, 5.5, 0.2]} />
         <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.8} blending={THREE.AdditiveBlending} />
       </mesh>
-      <mesh ref={innerRing} position={[0, 0, -0.2]}>
-        <boxGeometry args={[6.2, 6.2, 0.1]} />
+      <mesh ref={innerRing}>
+        <boxGeometry args={[4.5, 4.5, 0.1]} />
         <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.4} blending={THREE.AdditiveBlending} />
       </mesh>
 
