@@ -8,6 +8,45 @@ import ScrollRibbon from './ScrollRibbon';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const TerminalHUD = () => {
+  const [mem, setMem] = useState('0x4F9A');
+  const [pid, setPid] = useState('4092');
+  
+  useEffect(() => {
+    // High-frequency text scrambling (Zero lag, high visual clutter)
+    const interval = setInterval(() => {
+      if (Math.random() > 0.7) {
+        setMem('0x' + Math.floor(Math.random() * 65535).toString(16).toUpperCase());
+      }
+      if (Math.random() > 0.9) {
+        setPid(Math.floor(Math.random() * 9999).toString());
+      }
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="mt-20 flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        <div className="w-2 h-2 rounded-full bg-[var(--color-neon-cyan)] dot-glow-cyan animate-pulse"></div>
+        <span className="text-[10px] tracking-widest text-gray-500 uppercase">STATUS: ACTIVE [UCONN SCHOOL OF BUSINESS]</span>
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="w-2 h-2 rounded-full bg-[var(--color-neon-purple)] dot-glow-purple animate-pulse"></div>
+        <span className="text-[10px] tracking-widest text-gray-500 uppercase">BUILDING: 180 MATH LLC</span>
+      </div>
+      
+      {/* Glitchy Data Stream */}
+      <div className="absolute right-0 md:right-[-10%] top-[10%] hidden md:flex flex-col gap-1 font-mono text-[9px] text-[var(--color-neon-cyan)] opacity-60 mix-blend-screen text-right">
+        <span>SYS.ONLINE // PID {pid}</span>
+        <span>UPTIME: 99.97%</span>
+        <span>MEM: {mem}</span>
+        <span>NET: {Math.random().toFixed(4)} TB/s</span>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
@@ -147,30 +186,25 @@ function App() {
           <Hero3DCore />
         </div>
 
-        {/* z-10 Content */}
-        <div className="z-10 animate-up relative max-w-3xl">
-          <h1 className="text-[12vw] md:text-[10vw] font-black leading-[0.85] tracking-tighter uppercase text-white mb-0">
-            ROHAN
-          </h1>
-          <h1 className="text-[12vw] md:text-[10vw] font-black leading-[0.85] tracking-tighter uppercase text-outline-cyan mb-10">
-            KOSUR
-          </h1>
+        {/* Content */}
+        <div className="relative z-10 max-w-4xl pt-20 mix-blend-difference">
+          <div className="animate-up">
+            <h1 className="text-[12vw] md:text-[10vw] font-black leading-[0.85] tracking-tighter uppercase text-white">
+              ROHAN
+            </h1>
+            <h1 className="text-[12vw] md:text-[10vw] font-black leading-[0.85] tracking-tighter uppercase text-outline-cyan">
+              KOSUR
+            </h1>
+            
+            <div className="mt-8 border-l border-[var(--color-neon-cyan)] pl-6 max-w-xl">
+              <p className="text-xl md:text-2xl text-gray-400 font-light leading-relaxed">
+                Finance student & full-stack developer building at the intersection of <span className="font-calligraphy text-[var(--color-neon-cyan)] glow-cyan text-3xl">systems and strategy</span>
+              </p>
+            </div>
 
-          <div className="border-l-2 border-[var(--color-neon-cyan)] pl-6 py-1 relative">
-            <p className="text-lg md:text-2xl font-light leading-relaxed text-gray-200">
-              Finance student &amp; full-stack developer building at the intersection of{' '}
-              <span className="font-calligraphy text-[var(--color-neon-cyan)] glow-cyan">
-                systems and strategy
-              </span>
-            </p>
+            {/* Terminal HUD (High Clutter, 0 Lag) */}
+            <TerminalHUD />
           </div>
-        </div>
-
-        {/* Floating Data Feed */}
-        <div className="absolute top-1/3 right-8 md:right-24 hidden md:flex flex-col gap-1 font-mono text-[9px] text-[var(--color-neon-purple)] opacity-75 border-l border-[var(--color-neon-purple)]/50 pl-3 z-10">
-          <span className="animate-pulse">SYS.ONLINE // PID 4092</span>
-          <span>UPTIME: 99.97%</span>
-          <span>MEM: 0x4F9A</span>
         </div>
 
         {/* Bottom Status Indicators */}

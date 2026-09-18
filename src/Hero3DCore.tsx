@@ -140,41 +140,64 @@ const PaintingFrame = () => {
         <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.4} blending={THREE.AdditiveBlending} />
       </mesh>
 
-      {/* Floating particles inside the frame boundary */}
-      {Array.from({ length: 40 }).map((_, i) => (
-        <FrameParticle key={i} index={i} />
-      ))}
-
       {/* Center 4D Illusion */}
       <TesseractIllusion />
     </group>
   );
 };
 
-/* ─── Frame Particles ─── */
-const FrameParticle = ({ index }: { index: number }) => {
-  const ref = useRef<THREE.Mesh>(null);
+/* ─── Instanced Clutter Particles (High Clutter, 1 Draw Call) ─── */
+const ClutterParticles = () => {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
   
-  // Position particles mostly along the edges of the frame
-  const x = (Math.random() - 0.5) * 6;
-  const y = (Math.random() - 0.5) * 6;
-  const z = (Math.random() - 0.5) * 0.8;
-  const color = index % 2 === 0 ? "#ff00ff" : "#00ffff";
+  // 1000 particles costs the same as 1 particle when instanced
+  const count = 1000;
+  
+  const particles = useMemo(() => {
+    const temp = [];
+    for (let i = 0; i < count; i++) {
+      temp.push({
+        x: (Math.random() - 0.5) * 20,
+        y: (Math.random() - 0.5) * 20,
+        z: (Math.random() - 0.5) * 15,
+        speed: (Math.random() - 0.5) * 0.5,
+        scale: Math.random() * 0.05 + 0.01,
+      });
+    }
+    return temp;
+  }, []);
+
+  const dummy = useMemo(() => new THREE.Object3D(), []);
 
   useFrame((state) => {
-    if (!ref.current) return;
+    if (!meshRef.current) return;
     const t = state.clock.getElapsedTime();
-    ref.current.rotation.x = t + index;
-    ref.current.rotation.y = t * 1.5;
-    // Slight drift
-    ref.current.position.z = z + Math.sin(t * 2 + index) * 0.2;
+    
+    particles.forEach((p, i) => {
+      // Orbital drift around the center
+      const angle = t * p.speed + i;
+      const radius = Math.sqrt(p.x * p.x + p.z * p.z);
+      
+      dummy.position.set(
+        Math.cos(angle) * radius,
+        p.y + Math.sin(t * p.speed * 2) * 2, // Bobbing up and down
+        Math.sin(angle) * radius
+      );
+      
+      dummy.rotation.set(angle, angle * 1.5, 0);
+      dummy.scale.setScalar(p.scale);
+      
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
   });
 
   return (
-    <mesh ref={ref} position={[x, y, z]}>
-      <octahedronGeometry args={[0.08, 0]} />
-      <meshBasicMaterial color={color} wireframe transparent opacity={0.8} blending={THREE.AdditiveBlending} />
-    </mesh>
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <octahedronGeometry args={[1, 0]} />
+      <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.2} blending={THREE.AdditiveBlending} />
+    </instancedMesh>
   );
 };
 
@@ -188,7 +211,7 @@ export default function Hero3DCore() {
     >
       <ambientLight intensity={2} />
       
-      {/* The main scene */}
+      <ClutterParticles />
       <PaintingFrame />
     </Canvas>
   );
