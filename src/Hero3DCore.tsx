@@ -90,34 +90,49 @@ const TesseractIllusion = () => {
 /* ─── Artisanal Painting Frame ─── */
 const PaintingFrame = () => {
   const frameRef = useRef<THREE.Group>(null);
+  const outerRing = useRef<THREE.Mesh>(null);
+  const midRing = useRef<THREE.Mesh>(null);
+  const innerRing = useRef<THREE.Mesh>(null);
   const mouse = useRef({ x: 0, y: 0 });
 
   useFrame((state) => {
-    if (!frameRef.current) return;
+    if (!frameRef.current || !outerRing.current || !midRing.current || !innerRing.current) return;
     const t = state.clock.getElapsedTime();
     
-    // Mouse Parallax for the entire framed object
-    mouse.current.x += (state.pointer.x * 0.5 - mouse.current.x) * 0.1;
-    mouse.current.y += (state.pointer.y * 0.5 - mouse.current.y) * 0.1;
+    // Smooth mouse interpolation
+    mouse.current.x += (state.pointer.x - mouse.current.x) * 0.1;
+    mouse.current.y += (state.pointer.y - mouse.current.y) * 0.1;
 
-    frameRef.current.rotation.y = mouse.current.x + Math.sin(t * 0.2) * 0.1;
-    frameRef.current.rotation.x = -mouse.current.y + Math.cos(t * 0.3) * 0.05;
+    // Base subtle rotation for the whole group
+    frameRef.current.rotation.y = mouse.current.x * 0.2 + Math.sin(t * 0.2) * 0.1;
+    frameRef.current.rotation.x = -mouse.current.y * 0.2 + Math.cos(t * 0.3) * 0.05;
+
+    // Extreme Parallax Translation for the rings (moving side to side)
+    // The outermost ring moves the most, creating huge depth
+    outerRing.current.position.x = mouse.current.x * 1.5;
+    outerRing.current.position.y = mouse.current.y * 1.5;
+    
+    midRing.current.position.x = mouse.current.x * 0.8;
+    midRing.current.position.y = mouse.current.y * 0.8;
+    
+    innerRing.current.position.x = mouse.current.x * 0.2;
+    innerRing.current.position.y = mouse.current.y * 0.2;
   });
 
   return (
     <group ref={frameRef}>
       {/* Outer heavy frame */}
-      <mesh>
+      <mesh ref={outerRing}>
         <boxGeometry args={[6.5, 6.5, 0.5]} />
         <meshBasicMaterial color="#ff00ff" wireframe transparent opacity={0.6} blending={THREE.AdditiveBlending} />
       </mesh>
       
       {/* Inner intricate frame rails */}
-      <mesh position={[0, 0, 0.2]}>
+      <mesh ref={midRing} position={[0, 0, 0.2]}>
         <boxGeometry args={[6.2, 6.2, 0.1]} />
         <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.8} blending={THREE.AdditiveBlending} />
       </mesh>
-      <mesh position={[0, 0, -0.2]}>
+      <mesh ref={innerRing} position={[0, 0, -0.2]}>
         <boxGeometry args={[6.2, 6.2, 0.1]} />
         <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.4} blending={THREE.AdditiveBlending} />
       </mesh>
