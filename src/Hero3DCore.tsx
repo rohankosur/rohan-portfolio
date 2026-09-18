@@ -1,6 +1,6 @@
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
+
 import * as THREE from 'three';
 
 /* ─── 4D Tesseract Illusion ─── */
@@ -61,13 +61,13 @@ const TesseractIllusion = () => {
       {/* Outer Hypercube boundary */}
       <mesh ref={outerCube}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color="#ff00ff" wireframe transparent opacity={0.6} />
+        <meshBasicMaterial color="#ff00ff" wireframe transparent opacity={0.9} blending={THREE.AdditiveBlending} />
       </mesh>
       
       {/* Inner Hypercube boundary */}
       <mesh ref={innerCube}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.8} />
+        <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.9} blending={THREE.AdditiveBlending} />
       </mesh>
 
       {/* Tesseract Connection Lines */}
@@ -75,13 +75,13 @@ const TesseractIllusion = () => {
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" count={16} array={linePositions} itemSize={3} args={[linePositions, 3]} />
         </bufferGeometry>
-        <lineBasicMaterial color="#ffffff" transparent opacity={0.5} />
+        <lineBasicMaterial color="#ffffff" transparent opacity={0.8} blending={THREE.AdditiveBlending} />
       </lineSegments>
 
       {/* Pulsing Core Knot */}
       <mesh ref={coreKnot}>
         <torusKnotGeometry args={[0.4, 0.02, 128, 16, 3, 5]} />
-        <meshBasicMaterial color="#00ff66" wireframe transparent opacity={0.9} />
+        <meshBasicMaterial color="#00ff66" wireframe transparent opacity={0.9} blending={THREE.AdditiveBlending} />
       </mesh>
     </group>
   );
@@ -109,17 +109,17 @@ const PaintingFrame = () => {
       {/* Outer heavy frame */}
       <mesh>
         <boxGeometry args={[6.5, 6.5, 0.5]} />
-        <meshBasicMaterial color="#ff00ff" wireframe transparent opacity={0.3} />
+        <meshBasicMaterial color="#ff00ff" wireframe transparent opacity={0.6} blending={THREE.AdditiveBlending} />
       </mesh>
       
       {/* Inner intricate frame rails */}
       <mesh position={[0, 0, 0.2]}>
         <boxGeometry args={[6.2, 6.2, 0.1]} />
-        <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.5} />
+        <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.8} blending={THREE.AdditiveBlending} />
       </mesh>
       <mesh position={[0, 0, -0.2]}>
         <boxGeometry args={[6.2, 6.2, 0.1]} />
-        <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.2} />
+        <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.4} blending={THREE.AdditiveBlending} />
       </mesh>
 
       {/* Floating particles inside the frame boundary */}
@@ -155,27 +155,23 @@ const FrameParticle = ({ index }: { index: number }) => {
   return (
     <mesh ref={ref} position={[x, y, z]}>
       <octahedronGeometry args={[0.08, 0]} />
-      <meshBasicMaterial color={color} wireframe />
+      <meshBasicMaterial color={color} wireframe transparent opacity={0.8} blending={THREE.AdditiveBlending} />
     </mesh>
   );
 };
 
-/* ─── Canvas Wrapper with Bloom ─── */
+/* ─── Canvas Wrapper (Transparent & Fast) ─── */
 export default function Hero3DCore() {
   return (
-    <Canvas camera={{ position: [0, 0, 9], fov: 45 }} dpr={[1, 2]}>
+    <Canvas 
+      camera={{ position: [0, 0, 9], fov: 45 }} 
+      dpr={[1, 2]} 
+      gl={{ alpha: true, antialias: false }}
+    >
+      <ambientLight intensity={2} />
       
       {/* The main scene */}
       <PaintingFrame />
-
-      {/* Postprocessing for extreme Cyberpunk Neon Glow */}
-      <EffectComposer>
-        <Bloom 
-          luminanceThreshold={0} 
-          mipmapBlur 
-          intensity={6.0} 
-        />
-      </EffectComposer>
     </Canvas>
   );
 }
