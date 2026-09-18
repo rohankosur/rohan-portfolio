@@ -15,29 +15,32 @@ const Starfield: React.FC = () => {
     canvas.height = height;
 
     // Stars
-    const stars: { x: number; y: number; size: number; alpha: number; speed: number }[] = [];
+    const stars: { x: number; y: number; size: number; alpha: number; speed: number; color: string }[] = [];
     for (let i = 0; i < 200; i++) {
       stars.push({
         x: Math.random() * width,
         y: Math.random() * height,
         size: Math.random() * 1.5,
         alpha: Math.random(),
-        speed: Math.random() * 0.05
+        speed: Math.random() * 0.05,
+        color: Math.random() > 0.5 ? '0, 229, 255' : '255, 0, 255' // Cyberpunk cyan or magenta
       });
     }
 
     // Shooting stars
-    const shootingStars: { x: number; y: number; length: number; speed: number; angle: number; active: boolean; life: number }[] = [];
+    const shootingStars: { x: number; y: number; length: number; speed: number; angle: number; active: boolean; life: number; color: string }[] = [];
     const spawnShootingStar = () => {
-      if (Math.random() > 0.95 && shootingStars.filter(s => s.active).length < 2) {
+      // Increased frequency slightly
+      if (Math.random() > 0.90 && shootingStars.filter(s => s.active).length < 3) {
         shootingStars.push({
           x: Math.random() * width,
           y: Math.random() * height * 0.5,
-          length: 50 + Math.random() * 100,
-          speed: 15 + Math.random() * 10,
+          length: 80 + Math.random() * 150,
+          speed: 20 + Math.random() * 15,
           angle: (Math.PI / 4) + (Math.random() * 0.2 - 0.1), // roughly 45 degrees downwards
           active: true,
-          life: 1.0
+          life: 1.0,
+          color: Math.random() > 0.5 ? '0, 229, 255' : '255, 0, 255' // Cyberpunk cyan or magenta
         });
       }
     };
@@ -54,8 +57,12 @@ const Starfield: React.FC = () => {
         
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+        // Add a slight glow effect
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = `rgba(${star.color}, ${star.alpha})`;
+        ctx.fillStyle = `rgba(${star.color}, ${star.alpha})`;
         ctx.fill();
+        ctx.shadowBlur = 0; // Reset for performance
       });
 
       // Handle shooting stars
@@ -72,16 +79,19 @@ const Starfield: React.FC = () => {
         ctx.lineTo(ss.x - Math.cos(ss.angle) * ss.length, ss.y - Math.sin(ss.angle) * ss.length);
         
         const gradient = ctx.createLinearGradient(ss.x, ss.y, ss.x - Math.cos(ss.angle) * ss.length, ss.y - Math.sin(ss.angle) * ss.length);
-        gradient.addColorStop(0, `rgba(255, 255, 255, ${ss.life})`);
-        gradient.addColorStop(1, `rgba(255, 255, 255, 0)`);
+        gradient.addColorStop(0, `rgba(${ss.color}, ${ss.life})`);
+        gradient.addColorStop(1, `rgba(${ss.color}, 0)`);
         
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = `rgb(${ss.color})`;
         ctx.strokeStyle = gradient;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 2.5;
         ctx.stroke();
+        ctx.shadowBlur = 0; // Reset
 
         ss.x += Math.cos(ss.angle) * ss.speed;
         ss.y += Math.sin(ss.angle) * ss.speed;
-        ss.life -= 0.02;
+        ss.life -= 0.015; // Slowed down fade out slightly
 
         if (ss.life <= 0 || ss.x > width || ss.y > height) {
           ss.active = false;
@@ -110,7 +120,7 @@ const Starfield: React.FC = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed top-0 left-0 w-full h-full pointer-events-none z-[-1]"
+      className="fixed top-0 left-0 w-full h-full pointer-events-none z-0"
     />
   );
 };
