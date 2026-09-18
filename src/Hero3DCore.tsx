@@ -171,9 +171,9 @@ export default function Hero3DCore() {
       {/* Postprocessing for extreme Cyberpunk Neon Glow */}
       <EffectComposer>
         <Bloom 
-          luminanceThreshold={0.1} 
+          luminanceThreshold={0} 
           mipmapBlur 
-          intensity={2.5} 
+          intensity={6.0} 
         />
       </EffectComposer>
     </Canvas>
