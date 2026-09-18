@@ -55,14 +55,17 @@ const Starfield: React.FC = () => {
         star.alpha += star.speed;
         if (star.alpha > 1 || star.alpha < 0.2) star.speed *= -1;
         
+        // Core
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-        // Add a slight glow effect
-        ctx.shadowBlur = 5;
-        ctx.shadowColor = `rgba(${star.color}, ${star.alpha})`;
         ctx.fillStyle = `rgba(${star.color}, ${star.alpha})`;
         ctx.fill();
-        ctx.shadowBlur = 0; // Reset for performance
+
+        // Fake glow (much faster than shadowBlur)
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size * 3, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${star.color}, ${star.alpha * 0.2})`;
+        ctx.fill();
       });
 
       // Handle shooting stars
@@ -78,20 +81,23 @@ const Starfield: React.FC = () => {
         ctx.moveTo(ss.x, ss.y);
         ctx.lineTo(ss.x - Math.cos(ss.angle) * ss.length, ss.y - Math.sin(ss.angle) * ss.length);
         
+        // Outer glow (faked)
+        ctx.strokeStyle = `rgba(${ss.color}, ${ss.life * 0.2})`;
+        ctx.lineWidth = 6;
+        ctx.stroke();
+
+        // Core streak
         const gradient = ctx.createLinearGradient(ss.x, ss.y, ss.x - Math.cos(ss.angle) * ss.length, ss.y - Math.sin(ss.angle) * ss.length);
         gradient.addColorStop(0, `rgba(${ss.color}, ${ss.life})`);
         gradient.addColorStop(1, `rgba(${ss.color}, 0)`);
         
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = `rgb(${ss.color})`;
         ctx.strokeStyle = gradient;
-        ctx.lineWidth = 2.5;
+        ctx.lineWidth = 2;
         ctx.stroke();
-        ctx.shadowBlur = 0; // Reset
 
         ss.x += Math.cos(ss.angle) * ss.speed;
         ss.y += Math.sin(ss.angle) * ss.speed;
-        ss.life -= 0.015; // Slowed down fade out slightly
+        ss.life -= 0.015; // Fade out
 
         if (ss.life <= 0 || ss.x > width || ss.y > height) {
           ss.active = false;

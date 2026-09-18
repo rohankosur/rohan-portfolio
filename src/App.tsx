@@ -143,7 +143,7 @@ function App() {
       {/* Section 001 / HERO */}
       <section id="hero" className="min-h-screen relative py-32 px-6 md:px-20 border-t border-white/5 flex flex-col justify-center">
         {/* Hero3DCore right-positioned */}
-        <div className="absolute right-[-25%] md:right-[-5%] top-1/2 -translate-y-1/2 w-[80vw] h-[80vw] max-w-[900px] pointer-events-auto z-0 cursor-crosshair">
+        <div className="absolute right-[-25%] md:right-[-5%] top-1/2 -translate-y-1/2 w-[80vw] h-[80vw] max-w-[900px] pointer-events-auto z-0 cursor-crosshair mix-blend-screen">
           <Hero3DCore />
         </div>
 
