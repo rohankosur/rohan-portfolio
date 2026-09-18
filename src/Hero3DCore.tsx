@@ -164,7 +164,7 @@ const FrameParticle = ({ index }: { index: number }) => {
 export default function Hero3DCore() {
   return (
     <Canvas 
-      camera={{ position: [0, 0, 9], fov: 45 }} 
+      camera={{ position: [0, 0, 14], fov: 45 }} 
       dpr={[1, 2]} 
       gl={{ alpha: true, antialias: false }}
     >
