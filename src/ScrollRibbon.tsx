@@ -8,37 +8,42 @@ export default function ScrollRibbon() {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    const paths = svgRef.current?.querySelectorAll('path');
-    
-    if (paths) {
-      paths.forEach((path, i) => {
-        const len = path.getTotalLength();
+    if (!svgRef.current) return;
 
-        gsap.set(path, {
-          strokeDasharray: len,
-          strokeDashoffset: len,
-        });
+    const ctx = gsap.context(() => {
+      const paths = svgRef.current?.querySelectorAll('path');
+      if (paths) {
+        paths.forEach((path, i) => {
+          const len = path.getTotalLength();
 
-        gsap.to(path, {
-          strokeDashoffset: 0,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: document.documentElement,
-            start: 'top top',
-            end: 'bottom bottom',
-            scrub: 1 + (i * 0.2), // Parallax draw speed per path
-          },
+          gsap.set(path, {
+            strokeDasharray: len,
+            strokeDashoffset: len,
+          });
+
+          gsap.to(path, {
+            strokeDashoffset: 0,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: document.documentElement,
+              start: 'top top',
+              end: 'bottom bottom',
+              scrub: 1 + (i * 0.2), // Parallax draw speed per path
+            },
+          });
         });
-      });
-      
-      // Color shift animation
-      gsap.to(svgRef.current, {
-        filter: "hue-rotate(360deg)",
-        ease: "none",
-        duration: 15,
-        repeat: -1
-      });
-    }
+        
+        // Color shift animation
+        gsap.to(svgRef.current, {
+          filter: "hue-rotate(360deg)",
+          ease: "none",
+          duration: 15,
+          repeat: -1
+        });
+      }
+    }, svgRef);
+
+    return () => ctx.revert();
   }, []);
 
   return (

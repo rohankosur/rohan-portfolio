@@ -9,38 +9,39 @@ const Starfield: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let width = window.innerWidth;
     let height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
 
     // Stars
     const stars: { x: number; y: number; size: number; alpha: number; speed: number; color: string }[] = [];
-    for (let i = 0; i < 200; i++) {
+    for (let i = 0; i < 220; i++) {
       stars.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        size: Math.random() * 1.5,
-        alpha: Math.random(),
-        speed: Math.random() * 0.05,
-        color: Math.random() > 0.5 ? '0, 229, 255' : '255, 0, 255' // Cyberpunk cyan or magenta
+        size: Math.random() * 1.5 + 0.3,
+        alpha: Math.random() * 0.8 + 0.2,
+        speed: (Math.random() * 0.04 + 0.01) * (Math.random() > 0.5 ? 1 : -1),
+        color: Math.random() > 0.4 ? '0, 229, 255' : '255, 0, 127' // Cyberpunk cyan or hot pink
       });
     }
 
     // Shooting stars
     const shootingStars: { x: number; y: number; length: number; speed: number; angle: number; active: boolean; life: number; color: string }[] = [];
     const spawnShootingStar = () => {
-      // Increased frequency slightly
-      if (Math.random() > 0.90 && shootingStars.filter(s => s.active).length < 3) {
+      if (Math.random() > 0.92 && shootingStars.filter(s => s.active).length < 3) {
         shootingStars.push({
           x: Math.random() * width,
           y: Math.random() * height * 0.5,
-          length: 80 + Math.random() * 150,
-          speed: 20 + Math.random() * 15,
-          angle: (Math.PI / 4) + (Math.random() * 0.2 - 0.1), // roughly 45 degrees downwards
+          length: 90 + Math.random() * 160,
+          speed: 22 + Math.random() * 16,
+          angle: (Math.PI / 4) + (Math.random() * 0.2 - 0.1),
           active: true,
           life: 1.0,
-          color: Math.random() > 0.5 ? '0, 229, 255' : '255, 0, 255' // Cyberpunk cyan or magenta
+          color: Math.random() > 0.4 ? '0, 229, 255' : '255, 0, 127'
         });
       }
     };
@@ -53,18 +54,24 @@ const Starfield: React.FC = () => {
       // Draw static/twinkling stars
       stars.forEach(star => {
         star.alpha += star.speed;
-        if (star.alpha > 1 || star.alpha < 0.2) star.speed *= -1;
+        if (star.alpha > 1) {
+          star.alpha = 1;
+          star.speed = -Math.abs(star.speed);
+        } else if (star.alpha < 0.15) {
+          star.alpha = 0.15;
+          star.speed = Math.abs(star.speed);
+        }
         
-        // Core
+        // Star Core
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${star.color}, ${star.alpha})`;
         ctx.fill();
 
-        // Fake glow (much faster than shadowBlur)
+        // Star Glow halo
         ctx.beginPath();
-        ctx.arc(star.x, star.y, star.size * 3, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${star.color}, ${star.alpha * 0.2})`;
+        ctx.arc(star.x, star.y, star.size * 2.8, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${star.color}, ${star.alpha * 0.25})`;
         ctx.fill();
       });
 
@@ -77,18 +84,21 @@ const Starfield: React.FC = () => {
           continue;
         }
 
+        const endX = ss.x - Math.cos(ss.angle) * ss.length;
+        const endY = ss.y - Math.sin(ss.angle) * ss.length;
+
+        // Outer glow
         ctx.beginPath();
         ctx.moveTo(ss.x, ss.y);
-        ctx.lineTo(ss.x - Math.cos(ss.angle) * ss.length, ss.y - Math.sin(ss.angle) * ss.length);
-        
-        // Outer glow (faked)
-        ctx.strokeStyle = `rgba(${ss.color}, ${ss.life * 0.2})`;
+        ctx.lineTo(endX, endY);
+        ctx.strokeStyle = `rgba(${ss.color}, ${ss.life * 0.25})`;
         ctx.lineWidth = 6;
         ctx.stroke();
 
         // Core streak
-        const gradient = ctx.createLinearGradient(ss.x, ss.y, ss.x - Math.cos(ss.angle) * ss.length, ss.y - Math.sin(ss.angle) * ss.length);
-        gradient.addColorStop(0, `rgba(${ss.color}, ${ss.life})`);
+        const gradient = ctx.createLinearGradient(ss.x, ss.y, endX, endY);
+        gradient.addColorStop(0, `rgba(255, 255, 255, ${ss.life})`);
+        gradient.addColorStop(0.2, `rgba(${ss.color}, ${ss.life * 0.9})`);
         gradient.addColorStop(1, `rgba(${ss.color}, 0)`);
         
         ctx.strokeStyle = gradient;
@@ -97,7 +107,7 @@ const Starfield: React.FC = () => {
 
         ss.x += Math.cos(ss.angle) * ss.speed;
         ss.y += Math.sin(ss.angle) * ss.speed;
-        ss.life -= 0.015; // Fade out
+        ss.life -= 0.016;
 
         if (ss.life <= 0 || ss.x > width || ss.y > height) {
           ss.active = false;
@@ -112,8 +122,9 @@ const Starfield: React.FC = () => {
     const handleResize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
     };
     window.addEventListener('resize', handleResize);
 

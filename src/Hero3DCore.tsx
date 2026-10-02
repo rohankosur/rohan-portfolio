@@ -1,7 +1,46 @@
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
+
+/* ─── Static Constants & Deterministic Seeded PRNG ─── */
+const CUBE_VERTICES = [
+  [1, 1, 1], [1, 1, -1], [1, -1, 1], [1, -1, -1],
+  [-1, 1, 1], [-1, 1, -1], [-1, -1, 1], [-1, -1, -1]
+];
+
+const PARTICLE_COUNT = 800;
+
+function createSeededParticles(count: number, seed = 42) {
+  let s = seed;
+  const rand = () => {
+    let t = (s += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+
+  const list = [];
+  for (let i = 0; i < count; i++) {
+    const x = (rand() - 0.5) * 22;
+    const y = (rand() - 0.5) * 22;
+    const z = (rand() - 0.5) * 16;
+    const radius = Math.sqrt(x * x + z * z);
+    const baseAngle = Math.atan2(z, x);
+    list.push({
+      x,
+      y,
+      z,
+      radius,
+      baseAngle,
+      speed: (rand() - 0.5) * 0.4,
+      scale: rand() * 0.045 + 0.012,
+    });
+  }
+  return list;
+}
+
+const STATIC_PARTICLES = createSeededParticles(PARTICLE_COUNT);
 
 /* ─── 4D Tesseract Illusion ─── */
 const TesseractIllusion = () => {
@@ -9,8 +48,6 @@ const TesseractIllusion = () => {
   const innerCube = useRef<THREE.Mesh>(null);
   const coreKnot = useRef<THREE.Mesh>(null);
   const group = useRef<THREE.Group>(null);
-  
-  // Create edges geometry for the connection lines between inner and outer cubes
   const linesRef = useRef<THREE.LineSegments>(null);
 
   useFrame((state) => {
@@ -26,7 +63,7 @@ const TesseractIllusion = () => {
     outerCube.current.scale.setScalar(currentOuterSize);
     innerCube.current.scale.setScalar(currentInnerSize);
 
-    // Complex continuous rotation
+    // Continuous multi-axis rotation
     group.current.rotation.x = t * 0.3;
     group.current.rotation.y = t * 0.4;
     group.current.rotation.z = t * 0.2;
@@ -34,17 +71,11 @@ const TesseractIllusion = () => {
     coreKnot.current.rotation.x = -t * 0.6;
     coreKnot.current.rotation.y = t * 0.8;
     
-    // Update connecting lines between the two cubes' vertices
+    // Update connecting lines between outer and inner vertices
     const posAttribute = linesRef.current.geometry.getAttribute('position') as THREE.BufferAttribute;
     
-    // 8 vertices of a cube
-    const vertices = [
-      [1, 1, 1], [1, 1, -1], [1, -1, 1], [1, -1, -1],
-      [-1, 1, 1], [-1, 1, -1], [-1, -1, 1], [-1, -1, -1]
-    ];
-
     let i = 0;
-    vertices.forEach(v => {
+    CUBE_VERTICES.forEach(v => {
       // Outer vertex
       posAttribute.setXYZ(i++, v[0] * currentOuterSize * 0.5, v[1] * currentOuterSize * 0.5, v[2] * currentOuterSize * 0.5);
       // Inner vertex
@@ -53,7 +84,7 @@ const TesseractIllusion = () => {
     posAttribute.needsUpdate = true;
   });
 
-  // Initial empty buffer for the 8 connecting lines (16 vertices total, 2 per line)
+  // Initial buffer for 8 connecting lines (16 vertices, 2 per line)
   const linePositions = useMemo(() => new Float32Array(16 * 3), []);
 
   return (
@@ -61,13 +92,13 @@ const TesseractIllusion = () => {
       {/* Outer Hypercube boundary */}
       <mesh ref={outerCube}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color="#ff00ff" wireframe transparent opacity={0.9} blending={THREE.AdditiveBlending} />
+        <meshBasicMaterial color="#ff007f" wireframe transparent opacity={0.85} blending={THREE.AdditiveBlending} />
       </mesh>
       
       {/* Inner Hypercube boundary */}
       <mesh ref={innerCube}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.9} blending={THREE.AdditiveBlending} />
+        <meshBasicMaterial color="#00e5ff" wireframe transparent opacity={0.85} blending={THREE.AdditiveBlending} />
       </mesh>
 
       {/* Tesseract Connection Lines */}
@@ -80,40 +111,36 @@ const TesseractIllusion = () => {
 
       {/* Pulsing Core Knot */}
       <mesh ref={coreKnot}>
-        <torusKnotGeometry args={[0.4, 0.02, 128, 16, 3, 5]} />
+        <torusKnotGeometry args={[0.4, 0.025, 128, 16, 3, 5]} />
         <meshBasicMaterial color="#00ff66" wireframe transparent opacity={0.9} blending={THREE.AdditiveBlending} />
       </mesh>
     </group>
   );
 };
 
-/* ─── Artisanal Painting Frame ─── */
+/* ─── Artisanal Gyroscopic Orbital Frame ─── */
 const PaintingFrame = () => {
   const outerRing = useRef<THREE.Mesh>(null);
   const midRing = useRef<THREE.Mesh>(null);
   const innerRing = useRef<THREE.Mesh>(null);
   const mouse = useRef({ x: 0, y: 0 });
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (!outerRing.current || !midRing.current || !innerRing.current) return;
     const t = state.clock.getElapsedTime();
     
-    // Incredibly smooth lerp for mouse coordinates
-    // Convert pointer to a desired rotation angle (approx 45 degrees max)
+    // Frame-rate independent pointer damping
     const targetX = state.pointer.x * (Math.PI / 4);
     const targetY = state.pointer.y * (Math.PI / 4);
     
-    mouse.current.x = THREE.MathUtils.lerp(mouse.current.x, targetX, 0.03);
-    mouse.current.y = THREE.MathUtils.lerp(mouse.current.y, targetY, 0.03);
+    mouse.current.x = THREE.MathUtils.damp(mouse.current.x, targetX, 2.2, delta);
+    mouse.current.y = THREE.MathUtils.damp(mouse.current.y, targetY, 2.2, delta);
 
-    // Gyroscopic Orbital Effect
-    // The rings rotate around the center, responding to the mouse but maintaining an orbital flow
-    
     // Outer ring: dramatic follow
     outerRing.current.rotation.y = mouse.current.x * 1.2 + Math.sin(t * 0.2) * 0.1;
     outerRing.current.rotation.x = -mouse.current.y * 1.2 + Math.cos(t * 0.3) * 0.05;
     
-    // Mid ring: inverted/counter-orbit follow for a complex mechanical feel
+    // Mid ring: counter-orbit follow
     midRing.current.rotation.y = -mouse.current.x * 0.6 + Math.sin(t * 0.3 + 1) * 0.2;
     midRing.current.rotation.x = mouse.current.y * 0.6 + Math.cos(t * 0.4 + 1) * 0.1;
     
@@ -127,17 +154,17 @@ const PaintingFrame = () => {
       {/* Outer heavy frame */}
       <mesh ref={outerRing}>
         <boxGeometry args={[6.5, 6.5, 0.5]} />
-        <meshBasicMaterial color="#ff00ff" wireframe transparent opacity={0.6} blending={THREE.AdditiveBlending} />
+        <meshBasicMaterial color="#ff007f" wireframe transparent opacity={0.6} blending={THREE.AdditiveBlending} />
       </mesh>
       
       {/* Inner intricate frame rails */}
       <mesh ref={midRing}>
         <boxGeometry args={[5.5, 5.5, 0.2]} />
-        <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.8} blending={THREE.AdditiveBlending} />
+        <meshBasicMaterial color="#00e5ff" wireframe transparent opacity={0.8} blending={THREE.AdditiveBlending} />
       </mesh>
       <mesh ref={innerRing}>
         <boxGeometry args={[4.5, 4.5, 0.1]} />
-        <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.4} blending={THREE.AdditiveBlending} />
+        <meshBasicMaterial color="#00e5ff" wireframe transparent opacity={0.4} blending={THREE.AdditiveBlending} />
       </mesh>
 
       {/* Center 4D Illusion */}
@@ -146,42 +173,23 @@ const PaintingFrame = () => {
   );
 };
 
-/* ─── Instanced Clutter Particles (High Clutter, 1 Draw Call) ─── */
+/* ─── Instanced Clutter Particles (High-Performance Instancing) ─── */
 const ClutterParticles = () => {
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  
-  // 1000 particles costs the same as 1 particle when instanced
-  const count = 1000;
-  
-  const particles = useMemo(() => {
-    const temp = [];
-    for (let i = 0; i < count; i++) {
-      temp.push({
-        x: (Math.random() - 0.5) * 20,
-        y: (Math.random() - 0.5) * 20,
-        z: (Math.random() - 0.5) * 15,
-        speed: (Math.random() - 0.5) * 0.5,
-        scale: Math.random() * 0.05 + 0.01,
-      });
-    }
-    return temp;
-  }, []);
-
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
   useFrame((state) => {
     if (!meshRef.current) return;
     const t = state.clock.getElapsedTime();
     
-    particles.forEach((p, i) => {
-      // Orbital drift around the center
-      const angle = t * p.speed + i;
-      const radius = Math.sqrt(p.x * p.x + p.z * p.z);
+    STATIC_PARTICLES.forEach((p, i) => {
+      // Orbital drift around center using precomputed base angles and radii
+      const angle = t * p.speed + p.baseAngle;
       
       dummy.position.set(
-        Math.cos(angle) * radius,
-        p.y + Math.sin(t * p.speed * 2) * 2, // Bobbing up and down
-        Math.sin(angle) * radius
+        Math.cos(angle) * p.radius,
+        p.y + Math.sin(t * p.speed * 2) * 2,
+        Math.sin(angle) * p.radius
       );
       
       dummy.rotation.set(angle, angle * 1.5, 0);
@@ -194,25 +202,31 @@ const ClutterParticles = () => {
   });
 
   return (
-    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+    <instancedMesh ref={meshRef} args={[undefined, undefined, PARTICLE_COUNT]}>
       <octahedronGeometry args={[1, 0]} />
-      <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.2} blending={THREE.AdditiveBlending} />
+      <meshBasicMaterial color="#00e5ff" wireframe transparent opacity={0.25} blending={THREE.AdditiveBlending} />
     </instancedMesh>
   );
 };
 
-/* ─── Canvas Wrapper (Transparent & Fast) ─── */
+/* ─── Canvas Wrapper with Bloom ─── */
 export default function Hero3DCore() {
   return (
     <Canvas 
       camera={{ position: [0, 0, 14], fov: 45 }} 
       dpr={[1, 2]} 
-      gl={{ alpha: true, antialias: false }}
+      gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
     >
-      <ambientLight intensity={2} />
-      
+      <ambientLight intensity={1.5} />
       <ClutterParticles />
       <PaintingFrame />
+      <EffectComposer multisampling={0}>
+        <Bloom 
+          luminanceThreshold={0.15} 
+          luminanceSmoothing={0.9} 
+          intensity={1.2} 
+        />
+      </EffectComposer>
     </Canvas>
   );
 }

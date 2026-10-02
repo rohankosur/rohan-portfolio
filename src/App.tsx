@@ -11,6 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
 const TerminalHUD = () => {
   const [mem, setMem] = useState('0x4F9A');
   const [pid, setPid] = useState('4092');
+  const [net, setNet] = useState('1.8492');
   
   useEffect(() => {
     // High-frequency text scrambling (Zero lag, high visual clutter)
@@ -18,10 +19,13 @@ const TerminalHUD = () => {
       if (Math.random() > 0.7) {
         setMem('0x' + Math.floor(Math.random() * 65535).toString(16).toUpperCase());
       }
-      if (Math.random() > 0.9) {
-        setPid(Math.floor(Math.random() * 9999).toString());
+      if (Math.random() > 0.85) {
+        setPid(Math.floor(Math.random() * 9000 + 1000).toString());
       }
-    }, 50);
+      if (Math.random() > 0.75) {
+        setNet((Math.random() * 2 + 0.5).toFixed(4));
+      }
+    }, 120);
     return () => clearInterval(interval);
   }, []);
 
@@ -29,47 +33,121 @@ const TerminalHUD = () => {
     <div className="mt-20 flex flex-col gap-4">
       <div className="flex items-center gap-3">
         <div className="w-2 h-2 rounded-full bg-[var(--color-neon-cyan)] dot-glow-cyan animate-pulse"></div>
-        <span className="text-[10px] tracking-widest text-gray-500 uppercase">STATUS: ACTIVE [UCONN SCHOOL OF BUSINESS]</span>
+        <span className="text-[10px] tracking-widest text-gray-400 uppercase">SYS.STATUS: NOMINAL // QUANTITATIVE CORE</span>
       </div>
       <div className="flex items-center gap-3">
         <div className="w-2 h-2 rounded-full bg-[var(--color-neon-purple)] dot-glow-purple animate-pulse"></div>
-        <span className="text-[10px] tracking-widest text-gray-500 uppercase">BUILDING: 180 MATH LLC</span>
+        <span className="text-[10px] tracking-widest text-gray-400 uppercase">AGENT PIPELINES: MULTI-MODEL / MCP</span>
       </div>
       
       {/* Glitchy Data Stream */}
-      <div className="absolute right-0 md:right-[-10%] top-[10%] hidden md:flex flex-col gap-1 font-mono text-[9px] text-[var(--color-neon-cyan)] opacity-60 mix-blend-screen text-right">
+      <div className="absolute right-0 md:right-[-10%] top-[10%] hidden md:flex flex-col gap-1 font-mono text-[9px] text-[var(--color-neon-cyan)] opacity-70 mix-blend-screen text-right">
         <span>SYS.ONLINE // PID {pid}</span>
         <span>UPTIME: 99.97%</span>
         <span>MEM: {mem}</span>
-        <span>NET: {Math.random().toFixed(4)} TB/s</span>
+        <span>NET: {net} TB/s</span>
       </div>
     </div>
   );
 };
 
-function App() {
-  const cursorRef = useRef<HTMLDivElement>(null);
-  const cursorDotRef = useRef<HTMLDivElement>(null);
-  const [time, setTime] = useState("");
+const CURRENT_YEAR = new Date().getFullYear();
+
+const ContributionHeatmap = () => {
+  const [activeDay, setActiveDay] = useState<{ day: number; commits: number } | null>(null);
+
+  return (
+    <div className="w-full overflow-x-auto pb-4 opacity-100 animate-up px-6 md:px-20">
+      <div className="flex justify-between items-center mb-4 font-mono text-[10px] text-gray-400">
+        <span className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-[var(--color-neon-cyan)] animate-pulse dot-glow-cyan"></span>
+          ACTIVITY TELEMETRY // 364-DAY CYCLE
+        </span>
+        <span className="text-[var(--color-neon-cyan)] font-mono">
+          {activeDay
+            ? `CYCLE DAY ${activeDay.day} // ${activeDay.commits} COMMITS VERIFIED`
+            : 'HOVER MATRIX NODE FOR TELEMETRY'}
+        </span>
+      </div>
+      <div className="inline-grid grid-rows-7 grid-flow-col gap-1 w-max p-4 bg-[var(--color-surface)] border border-white/10 rounded-sm">
+        {Array.from({ length: 364 }).map((_, i) => {
+          const val = (Math.sin(i * 0.37) * 0.4 + Math.sin(i * 1.83) * 0.3 + Math.cos(i * 0.08) * 0.3 + 1) / 2;
+          let bg = 'rgba(255,255,255,0.05)';
+          let shadow = 'none';
+          let commits = 0;
+          if (val > 0.85) { 
+            bg = 'var(--color-neon-cyan)'; 
+            shadow = '0 0 10px var(--color-neon-cyan)'; 
+            commits = Math.floor(val * 8) + 4;
+          } else if (val > 0.65) { 
+            bg = 'var(--color-neon-purple)'; 
+            shadow = '0 0 10px var(--color-neon-purple)'; 
+            commits = Math.floor(val * 5) + 2;
+          } else if (val > 0.45) { 
+            bg = 'rgba(255, 0, 127, 0.4)'; 
+            commits = 2;
+          } else if (val > 0.25) { 
+            bg = 'rgba(0, 229, 255, 0.2)'; 
+            commits = 1;
+          }
+
+          return (
+            <div
+              key={i}
+              onMouseEnter={() => setActiveDay({ day: i + 1, commits })}
+              onMouseLeave={() => setActiveDay(null)}
+              className="w-3 h-3 rounded-[2px] transition-all duration-200 hover:scale-150 hover:z-20 relative cursor-pointer"
+              style={{ backgroundColor: bg, boxShadow: shadow }}
+              title={`Day ${i + 1}: ${commits} commits`}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+/* Isolated Clock Ticker to prevent root re-renders */
+const ClockTicker = () => {
+  const [time, setTime] = useState(() =>
+    new Date().toLocaleTimeString('en-US', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    })
+  );
 
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
+    const interval = setInterval(() => {
       setTime(
-        now.toLocaleTimeString('en-US', {
+        new Date().toLocaleTimeString('en-US', {
           hour12: false,
           hour: '2-digit',
           minute: '2-digit',
           second: '2-digit',
         })
       );
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
+  return (
+    <div className="flex items-center gap-2">
+      <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-neon-cyan)] animate-pulse dot-glow-cyan"></span>
+      <span>TICK {time}</span>
+    </div>
+  );
+};
+
+function App() {
+  const appContainerRef = useRef<HTMLDivElement>(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const cursorDotRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+
     const cursor = cursorRef.current;
     const dot = cursorDotRef.current;
     if (!cursor || !dot) return;
@@ -79,7 +157,7 @@ function App() {
       gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0 });
     };
 
-    const onMouseEnter = () => gsap.to(cursor, { scale: 1.5, opacity: 0.8, duration: 0.2 });
+    const onMouseEnter = () => gsap.to(cursor, { scale: 1.5, opacity: 0.85, duration: 0.2 });
     const onMouseLeave = () => gsap.to(cursor, { scale: 1, opacity: 0.5, duration: 0.2 });
 
     window.addEventListener('mousemove', onMouseMove);
@@ -100,28 +178,32 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const elements = gsap.utils.toArray<HTMLElement>('.animate-up');
-    elements.forEach((el) => {
-      gsap.fromTo(
-        el,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      );
-    });
+    const ctx = gsap.context(() => {
+      const elements = gsap.utils.toArray<HTMLElement>('.animate-up');
+      elements.forEach((el) => {
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      });
+    }, appContainerRef);
+
+    return () => ctx.revert();
   }, []);
 
   return (
-    <div className="relative min-h-screen selection:bg-[var(--color-neon-purple)] selection:text-white pb-20 overflow-x-hidden bg-[var(--color-dark)] text-[var(--color-off-white)]">
+    <div ref={appContainerRef} className="relative min-h-screen selection:bg-[var(--color-neon-purple)] selection:text-white pb-20 overflow-x-hidden bg-[var(--color-dark)] text-[var(--color-off-white)]">
       {/* Background layers */}
       <Starfield />
       <ScrollRibbon />
@@ -129,11 +211,11 @@ function App() {
       {/* Custom Cursor */}
       <div
         ref={cursorDotRef}
-        className="fixed top-0 left-0 w-1.5 h-1.5 bg-[var(--color-neon-cyan)] rounded-full pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 dot-glow-cyan"
+        className="fixed top-0 left-0 w-1.5 h-1.5 bg-[var(--color-neon-cyan)] rounded-full pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 dot-glow-cyan hidden md:block"
       />
       <div
         ref={cursorRef}
-        className="fixed top-0 left-0 w-8 h-8 border border-[var(--color-neon-cyan)] rounded-full pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 opacity-50"
+        className="fixed top-0 left-0 w-8 h-8 border border-[var(--color-neon-cyan)] rounded-full pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 opacity-50 hidden md:block"
       />
 
       {/* Fixed Navigation */}
@@ -155,10 +237,7 @@ function App() {
             EXPERIENCE
           </a>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-neon-cyan)] animate-pulse dot-glow-cyan"></span>
-          <span>TICK {time}</span>
-        </div>
+        <ClockTicker />
       </nav>
 
       {/* Marquee Ticker */}
@@ -281,27 +360,7 @@ function App() {
         </div>
 
         {/* GitHub contribution heatmap grid */}
-        <div className="w-full overflow-x-auto pb-4 opacity-100 animate-up">
-          <div className="inline-grid grid-rows-7 grid-flow-col gap-1 w-max">
-            {Array.from({ length: 364 }).map((_, i) => {
-              const val = (Math.sin(i * 0.37) * 0.4 + Math.sin(i * 1.83) * 0.3 + Math.cos(i * 0.08) * 0.3 + 1) / 2;
-              let bg = 'rgba(255,255,255,0.05)';
-              let shadow = 'none';
-              if (val > 0.85) { bg = 'var(--color-neon-cyan)'; shadow = '0 0 10px var(--color-neon-cyan)'; }
-              else if (val > 0.65) { bg = 'var(--color-neon-purple)'; shadow = '0 0 10px var(--color-neon-purple)'; }
-              else if (val > 0.45) { bg = 'rgba(255, 0, 255, 0.4)'; }
-              else if (val > 0.25) { bg = 'rgba(0, 255, 255, 0.15)'; }
-
-              return (
-                <div
-                  key={i}
-                  className="w-3 h-3 rounded-[2px] transition-all duration-200 hover:scale-125 hover:z-10 relative cursor-none"
-                  style={{ backgroundColor: bg, boxShadow: shadow }}
-                />
-              );
-            })}
-          </div>
-        </div>
+        <ContributionHeatmap />
       </section>
 
       {/* Section 004 / TOOLKIT */}
@@ -654,7 +713,7 @@ function App() {
             ESTABLISH CONNECTION
           </a>
           <p className="mt-4 text-[9px] uppercase tracking-widest text-gray-600">
-            &copy; {new Date().getFullYear()} ROHAN KOSUR.
+            &copy; {CURRENT_YEAR} ROHAN KOSUR.
           </p>
         </div>
       </footer>
