@@ -1,20 +1,42 @@
 import { useEffect, useRef, useState } from 'react';
+import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { 
+  Activity, 
+  Cpu, 
+  Radio, 
+  Layers, 
+  Terminal as TerminalIcon, 
+  ExternalLink, 
+  Compass,
+  ShieldCheck,
+  ArrowUpRight,
+  TrendingUp
+} from 'lucide-react';
 import Starfield from './Starfield';
-import Hero3DCore from './Hero3DCore';
-import Mini3DNode from './Mini3DNode';
-import ScrollRibbon from './ScrollRibbon';
+import Experience3D from './Experience3D';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const TerminalHUD = () => {
+const GithubIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+  </svg>
+);
+
+const CURRENT_YEAR = new Date().getFullYear();
+
+/* ══════════════════════════════════════════════════════════════════════
+   PRECISION TELEMETRY HUD
+   ══════════════════════════════════════════════════════════════════════ */
+const TelemetryHUD = () => {
   const [mem, setMem] = useState('0x4F9A');
-  const [pid, setPid] = useState('4092');
-  const [net, setNet] = useState('1.8492');
-  
+  const [pid, setPid] = useState('8042');
+  const [altitude, setAltitude] = useState('98,420 FT');
+  const [flux, setFlux] = useState('142.8 µSv/h');
+
   useEffect(() => {
-    // High-frequency text scrambling (Zero lag, high visual clutter)
     const interval = setInterval(() => {
       if (Math.random() > 0.7) {
         setMem('0x' + Math.floor(Math.random() * 65535).toString(16).toUpperCase());
@@ -22,92 +44,59 @@ const TerminalHUD = () => {
       if (Math.random() > 0.85) {
         setPid(Math.floor(Math.random() * 9000 + 1000).toString());
       }
-      if (Math.random() > 0.75) {
-        setNet((Math.random() * 2 + 0.5).toFixed(4));
+      if (Math.random() > 0.8) {
+        setAltitude((98000 + Math.floor(Math.random() * 850)).toLocaleString() + ' FT');
       }
-    }, 120);
+      if (Math.random() > 0.75) {
+        setFlux((140 + Math.random() * 6.5).toFixed(1) + ' µSv/h');
+      }
+    }, 140);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="mt-20 flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <div className="w-2 h-2 rounded-full bg-[var(--color-neon-cyan)] dot-glow-cyan animate-pulse"></div>
-        <span className="text-[10px] tracking-widest text-gray-400 uppercase">SYS.STATUS: NOMINAL // QUANTITATIVE CORE</span>
+    <div className="mt-8 flex flex-col gap-3 font-mono text-[10px] tracking-widest text-slate-400">
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-[#00f2fe] dot-glow-cyan animate-pulse"></span>
+          <span className="text-white font-semibold">STATUS: NOMINAL</span>
+          <span className="text-slate-500">//</span>
+          <span className="text-slate-300">UCONN FINANCE '30</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
+          <span className="text-white font-semibold">PAYLOAD: ACTIVE</span>
+          <span className="text-slate-500">//</span>
+          <span className="text-slate-300">CAP NER-CT-071</span>
+        </div>
       </div>
-      <div className="flex items-center gap-3">
-        <div className="w-2 h-2 rounded-full bg-[var(--color-neon-purple)] dot-glow-purple animate-pulse"></div>
-        <span className="text-[10px] tracking-widest text-gray-400 uppercase">AGENT PIPELINES: MULTI-MODEL / MCP</span>
-      </div>
-      
-      {/* Glitchy Data Stream */}
-      <div className="absolute right-0 md:right-[-10%] top-[10%] hidden md:flex flex-col gap-1 font-mono text-[9px] text-[var(--color-neon-cyan)] opacity-70 mix-blend-screen text-right">
-        <span>SYS.ONLINE // PID {pid}</span>
-        <span>UPTIME: 99.97%</span>
-        <span>MEM: {mem}</span>
-        <span>NET: {net} TB/s</span>
-      </div>
-    </div>
-  );
-};
 
-const CURRENT_YEAR = new Date().getFullYear();
-
-const ContributionHeatmap = () => {
-  const [activeDay, setActiveDay] = useState<{ day: number; commits: number } | null>(null);
-
-  return (
-    <div className="w-full overflow-x-auto pb-4 opacity-100 animate-up px-6 md:px-20">
-      <div className="flex justify-between items-center mb-4 font-mono text-[10px] text-gray-400">
-        <span className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[var(--color-neon-cyan)] animate-pulse dot-glow-cyan"></span>
-          ACTIVITY TELEMETRY // 364-DAY CYCLE
-        </span>
-        <span className="text-[var(--color-neon-cyan)] font-mono">
-          {activeDay
-            ? `CYCLE DAY ${activeDay.day} // ${activeDay.commits} COMMITS VERIFIED`
-            : 'HOVER MATRIX NODE FOR TELEMETRY'}
-        </span>
-      </div>
-      <div className="inline-grid grid-rows-7 grid-flow-col gap-1 w-max p-4 bg-[var(--color-surface)] border border-white/10 rounded-sm">
-        {Array.from({ length: 364 }).map((_, i) => {
-          const val = (Math.sin(i * 0.37) * 0.4 + Math.sin(i * 1.83) * 0.3 + Math.cos(i * 0.08) * 0.3 + 1) / 2;
-          let bg = 'rgba(255,255,255,0.05)';
-          let shadow = 'none';
-          let commits = 0;
-          if (val > 0.85) { 
-            bg = 'var(--color-neon-cyan)'; 
-            shadow = '0 0 10px var(--color-neon-cyan)'; 
-            commits = Math.floor(val * 8) + 4;
-          } else if (val > 0.65) { 
-            bg = 'var(--color-neon-purple)'; 
-            shadow = '0 0 10px var(--color-neon-purple)'; 
-            commits = Math.floor(val * 5) + 2;
-          } else if (val > 0.45) { 
-            bg = 'rgba(255, 0, 127, 0.4)'; 
-            commits = 2;
-          } else if (val > 0.25) { 
-            bg = 'rgba(0, 229, 255, 0.2)'; 
-            commits = 1;
-          }
-
-          return (
-            <div
-              key={i}
-              onMouseEnter={() => setActiveDay({ day: i + 1, commits })}
-              onMouseLeave={() => setActiveDay(null)}
-              className="w-3 h-3 rounded-[2px] transition-all duration-200 hover:scale-150 hover:z-20 relative cursor-pointer"
-              style={{ backgroundColor: bg, boxShadow: shadow }}
-              title={`Day ${i + 1}: ${commits} commits`}
-            />
-          );
-        })}
+      {/* Real-time Atmospheric Telemetry Matrix */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-white/10 max-w-xl text-[9px]">
+        <div className="p-2 bg-[#0e1117]/80 border border-white/5 rounded-sm">
+          <div className="text-slate-500 uppercase">SYS.PID</div>
+          <div className="text-[#00f2fe] font-bold mt-0.5">{pid}</div>
+        </div>
+        <div className="p-2 bg-[#0e1117]/80 border border-white/5 rounded-sm">
+          <div className="text-slate-500 uppercase">MEM.BUFFER</div>
+          <div className="text-slate-200 font-bold mt-0.5">{mem}</div>
+        </div>
+        <div className="p-2 bg-[#0e1117]/80 border border-white/5 rounded-sm">
+          <div className="text-slate-500 uppercase">RAD.FLUX</div>
+          <div className="text-[#10b981] font-bold mt-0.5">{flux}</div>
+        </div>
+        <div className="p-2 bg-[#0e1117]/80 border border-white/5 rounded-sm">
+          <div className="text-slate-500 uppercase">PEAK.ALT</div>
+          <div className="text-white font-bold mt-0.5">{altitude}</div>
+        </div>
       </div>
     </div>
   );
 };
 
-/* Isolated Clock Ticker to prevent root re-renders */
+/* ══════════════════════════════════════════════════════════════════════
+   CLOCK TICKER COMPONENT (Isolated render)
+   ══════════════════════════════════════════════════════════════════════ */
 const ClockTicker = () => {
   const [time, setTime] = useState(() =>
     new Date().toLocaleTimeString('en-US', {
@@ -133,18 +122,53 @@ const ClockTicker = () => {
   }, []);
 
   return (
-    <div className="flex items-center gap-2">
-      <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-neon-cyan)] animate-pulse dot-glow-cyan"></span>
-      <span>TICK {time}</span>
+    <div className="flex items-center gap-2 font-mono text-[10px] text-slate-400">
+      <span className="w-1.5 h-1.5 rounded-full bg-[#00f2fe] animate-pulse dot-glow-cyan"></span>
+      <span className="tracking-widest">TICK {time} UTC-4</span>
     </div>
   );
 };
 
-function App() {
+/* ══════════════════════════════════════════════════════════════════════
+   MAIN PORTFOLIO APPLICATION
+   ══════════════════════════════════════════════════════════════════════ */
+export default function App() {
   const appContainerRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
+  // Smooth Scrolling with Lenis
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.1,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
+
+    const onScroll = () => {
+      const scrollY = window.scrollY;
+      const heroHeight = window.innerHeight * 1.5;
+      const progress = Math.min(Math.max(scrollY / heroHeight, 0), 1);
+      setScrollProgress(progress);
+    };
+
+    lenis.on('scroll', onScroll);
+
+    let rafId: number;
+    function raf(time: number) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+    rafId = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
+  }, []);
+
+  // Custom Cursor for Fine Pointers
   useEffect(() => {
     if (!window.matchMedia('(pointer: fine)').matches) return;
 
@@ -157,12 +181,12 @@ function App() {
       gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0 });
     };
 
-    const onMouseEnter = () => gsap.to(cursor, { scale: 1.5, opacity: 0.85, duration: 0.2 });
-    const onMouseLeave = () => gsap.to(cursor, { scale: 1, opacity: 0.5, duration: 0.2 });
+    const onMouseEnter = () => gsap.to(cursor, { scale: 1.6, borderColor: '#00f2fe', duration: 0.2 });
+    const onMouseLeave = () => gsap.to(cursor, { scale: 1.0, borderColor: 'rgba(0, 242, 254, 0.4)', duration: 0.2 });
 
     window.addEventListener('mousemove', onMouseMove);
 
-    const interactables = document.querySelectorAll('a, button, .group');
+    const interactables = document.querySelectorAll('a, button, .group, .interactive');
     interactables.forEach((el) => {
       el.addEventListener('mouseenter', onMouseEnter);
       el.addEventListener('mouseleave', onMouseLeave);
@@ -177,17 +201,18 @@ function App() {
     };
   }, []);
 
+  // GSAP ScrollTrigger Section Transitions
   useEffect(() => {
     const ctx = gsap.context(() => {
       const elements = gsap.utils.toArray<HTMLElement>('.animate-up');
       elements.forEach((el) => {
         gsap.fromTo(
           el,
-          { opacity: 0, y: 40 },
+          { opacity: 0, y: 35 },
           {
             opacity: 1,
             y: 0,
-            duration: 1,
+            duration: 0.9,
             ease: 'power3.out',
             scrollTrigger: {
               trigger: el,
@@ -203,530 +228,337 @@ function App() {
   }, []);
 
   return (
-    <div ref={appContainerRef} className="relative min-h-screen selection:bg-[var(--color-neon-purple)] selection:text-white pb-20 overflow-x-hidden bg-[var(--color-dark)] text-[var(--color-off-white)]">
-      {/* Background layers */}
+    <div
+      ref={appContainerRef}
+      className="relative min-h-screen selection:bg-[#00f2fe] selection:text-black pb-24 overflow-x-hidden bg-[#070709] text-[#e2e8f0]"
+    >
+      {/* 2D Background Cosmic Particle Canvas */}
       <Starfield />
-      <ScrollRibbon />
 
-      {/* Custom Cursor */}
+      {/* Custom Hardware Cursor */}
       <div
         ref={cursorDotRef}
-        className="fixed top-0 left-0 w-1.5 h-1.5 bg-[var(--color-neon-cyan)] rounded-full pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 dot-glow-cyan hidden md:block"
+        className="fixed top-0 left-0 w-1.5 h-1.5 bg-[#00f2fe] rounded-full pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 dot-glow-cyan hidden md:block"
       />
       <div
         ref={cursorRef}
-        className="fixed top-0 left-0 w-8 h-8 border border-[var(--color-neon-cyan)] rounded-full pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 opacity-50 hidden md:block"
+        className="fixed top-0 left-0 w-8 h-8 border border-[#00f2fe]/40 rounded-full pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 opacity-60 hidden md:block"
       />
 
-      {/* Fixed Navigation */}
-      <nav className="fixed top-0 left-0 w-full p-6 flex justify-between items-center z-40 font-mono text-[10px] tracking-[0.2em] text-gray-400 border-b border-white/5 backdrop-blur-md bg-[var(--color-dark)]/80">
-        <a href="#hero" className="text-white text-sm font-bold tracking-normal font-sans group">
-          Rohan Kosur<span className="text-[var(--color-neon-cyan)]">.</span>
+      {/* Top Fixed Engineering Navigation */}
+      <nav className="fixed top-0 left-0 w-full px-6 md:px-16 py-4 flex justify-between items-center z-40 font-mono text-[10px] tracking-[0.2em] border-b border-white/5 backdrop-blur-md bg-[#070709]/80">
+        <a href="#hero" className="flex items-center gap-2 text-white font-bold tracking-wider group text-xs">
+          <TerminalIcon className="w-3.5 h-3.5 text-[#00f2fe]" />
+          <span>ROHAN KOSUR</span>
+          <span className="text-[#00f2fe] font-mono text-[9px] px-1.5 py-0.5 rounded border border-[#00f2fe]/30 bg-[#00f2fe]/10">
+            ATMOSPHERIC TERMINAL
+          </span>
         </a>
-        <div className="hidden md:flex gap-12">
-          <a href="#work" className="hover:text-[var(--color-neon-cyan)] transition-colors">
-            WORK
+
+        <div className="hidden md:flex gap-10 text-slate-400">
+          <a href="#subsystems" className="hover:text-[#00f2fe] transition-colors">
+            01/SUBSYSTEMS
           </a>
-          <a href="#about" className="hover:text-[var(--color-neon-cyan)] transition-colors">
-            ABOUT
+          <a href="#research" className="hover:text-[#00f2fe] transition-colors">
+            02/COSMIC RAD
           </a>
-          <a href="#toolkit" className="hover:text-[var(--color-neon-cyan)] transition-colors">
-            TOOLKIT
+          <a href="#arsenal" className="hover:text-[#00f2fe] transition-colors">
+            03/ARSENAL
           </a>
-          <a href="#experience" className="hover:text-[var(--color-neon-cyan)] transition-colors">
-            EXPERIENCE
+          <a href="#contact" className="hover:text-[#00f2fe] transition-colors">
+            04/CONNECT
           </a>
         </div>
+
         <ClockTicker />
       </nav>
 
-      {/* Marquee Ticker */}
-      <div className="fixed top-[65px] left-0 w-full border-b border-white/5 py-2 overflow-hidden flex gap-8 font-mono text-[8px] uppercase tracking-widest text-gray-500 z-30 bg-[var(--color-dark)]/90 backdrop-blur-sm whitespace-nowrap pointer-events-none">
-        <div className="animate-[marquee_25s_linear_infinite] flex gap-12">
-          <span><span className="text-[var(--color-neon-purple)]">●</span> QUANTITATIVE FINANCE</span>
-          <span><span className="text-[var(--color-neon-cyan)]">●</span> AGENTIC SYSTEMS</span>
-          <span><span className="text-[var(--color-neon-purple)]">●</span> FULL-STACK ARCHITECTURE</span>
-          <span><span className="text-[var(--color-neon-cyan)]">●</span> UCONN SCHOOL OF BUSINESS</span>
-          <span><span className="text-[var(--color-neon-purple)]">●</span> 180 MATH LLC</span>
-          <span><span className="text-[var(--color-neon-cyan)]">●</span> HIGH-FREQUENCY LOGIC</span>
-          <span><span className="text-[var(--color-neon-purple)]">●</span> QUANTITATIVE FINANCE</span>
-          <span><span className="text-[var(--color-neon-cyan)]">●</span> AGENTIC SYSTEMS</span>
-          <span><span className="text-[var(--color-neon-purple)]">●</span> FULL-STACK ARCHITECTURE</span>
-          <span><span className="text-[var(--color-neon-cyan)]">●</span> UCONN SCHOOL OF BUSINESS</span>
-          <span><span className="text-[var(--color-neon-purple)]">●</span> 180 MATH LLC</span>
-          <span><span className="text-[var(--color-neon-cyan)]">●</span> HIGH-FREQUENCY LOGIC</span>
-        </div>
+      {/* ══════════════════════════════════════════════════════════════════
+          FIXED 3D HERO CANVAS (Centerpiece with Exploded Transition)
+          ══════════════════════════════════════════════════════════════════ */}
+      <div className="fixed right-[-15%] md:right-[-2%] top-1/2 -translate-y-1/2 w-[90vw] md:w-[60vw] h-[90vh] pointer-events-auto z-10 cursor-crosshair">
+        <Experience3D scrollProgress={scrollProgress} />
       </div>
 
-      {/* Section 001 / HERO */}
-      <section id="hero" className="min-h-screen relative py-32 px-6 md:px-20 border-t border-white/5 flex flex-col justify-center">
-        {/* Hero3DCore right-positioned */}
-        <div className="absolute right-[-25%] md:right-[-5%] top-1/2 -translate-y-1/2 w-[80vw] h-[80vw] max-w-[900px] pointer-events-auto z-0 cursor-crosshair mix-blend-screen">
-          <Hero3DCore />
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 max-w-4xl pt-20 mix-blend-difference">
+      {/* ══════════════════════════════════════════════════════════════════
+          HERO SECTION (Section 001)
+          ══════════════════════════════════════════════════════════════════ */}
+      <section
+        id="hero"
+        className="min-h-screen relative pt-36 pb-20 px-6 md:px-16 flex flex-col justify-center z-20 pointer-events-none"
+      >
+        <div className="max-w-2xl pointer-events-auto">
           <div className="animate-up">
-            <h1 className="text-[12vw] md:text-[10vw] font-black leading-[0.85] tracking-tighter uppercase text-white">
+            <div className="flex items-center gap-2 font-mono text-[10px] text-[#00f2fe] tracking-[0.25em] uppercase mb-4">
+              <Compass className="w-3.5 h-3.5 text-[#00f2fe]" />
+              <span>AEROSPACE INSTRUMENTATION // QUANTITATIVE ARCHITECTURE</span>
+            </div>
+
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase text-white leading-none">
               ROHAN
             </h1>
-            <h1 className="text-[12vw] md:text-[10vw] font-black leading-[0.85] tracking-tighter uppercase text-outline-cyan">
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#00f2fe] via-white to-[#10b981] leading-none mb-6">
               KOSUR
             </h1>
-            
-            <div className="mt-8 border-l border-[var(--color-neon-cyan)] pl-6 max-w-xl">
-              <p className="text-xl md:text-2xl text-gray-400 font-light leading-relaxed">
-                Finance student & full-stack developer building at the intersection of <span className="font-calligraphy text-[var(--color-neon-cyan)] glow-cyan text-3xl">systems and strategy</span>
-              </p>
-            </div>
 
-            {/* Terminal HUD (High Clutter, 0 Lag) */}
-            <TerminalHUD />
+            <p className="text-lg md:text-xl text-slate-300 font-light leading-relaxed max-w-xl">
+              Finance student at the <span className="text-white font-medium">University of Connecticut</span> (Class of 2030) building at the nexus of high-frequency quantitative systems, ed-tech scale, and autonomous AI telemetry.
+            </p>
+
+            {/* Dynamic Telemetry HUD */}
+            <TelemetryHUD />
+
+            <div className="mt-10 flex flex-wrap gap-4 font-mono text-xs">
+              <a
+                href="#subsystems"
+                className="px-6 py-3 rounded-sm bg-[#00f2fe] text-black font-bold tracking-wider flex items-center gap-2 hover:bg-[#10b981] transition-all shadow-[0_0_20px_rgba(0,242,254,0.3)]"
+              >
+                <span>EXPLORE EXPLODED VIEW</span>
+                <ArrowUpRight className="w-4 h-4" />
+              </a>
+              <a
+                href="https://github.com/rohankosur"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-3 rounded-sm border border-white/20 hover:border-[#00f2fe] text-white flex items-center gap-2 transition-all hover:bg-white/5"
+              >
+                <GithubIcon className="w-4 h-4" />
+                <span>GITHUB MATRIX</span>
+              </a>
+            </div>
           </div>
         </div>
 
-        {/* Bottom Status Indicators */}
-        <div className="absolute bottom-10 left-6 md:left-20 font-mono text-[9px] tracking-widest text-gray-400 flex flex-col gap-2 z-10">
-          <span className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-[var(--color-neon-cyan)] rounded-full dot-glow-cyan"></span>
-            STATUS: ACTIVE [UCONN SCHOOL OF BUSINESS]
+        {/* Scroll Indicator Prompt */}
+        <div className="absolute bottom-10 left-6 md:left-16 font-mono text-[9px] tracking-widest text-slate-500 flex items-center gap-3">
+          <span className="w-1.5 h-4 border border-slate-600 rounded-full flex justify-center pt-0.5">
+            <span className="w-0.5 h-1 bg-[#00f2fe] rounded-full animate-bounce"></span>
           </span>
-          <span className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-[var(--color-neon-purple)] rounded-full dot-glow-purple"></span>
-            BUILDING: 180 MATH LLC
+          <span>SCROLL TO DISENGAGE COMPONENT LOCKS (EXPLODED SCHEMATIC)</span>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          SUBSYSTEM SHOWCASE (Section 002: Exploded Clusters)
+          ══════════════════════════════════════════════════════════════════ */}
+      <section
+        id="subsystems"
+        className="min-h-screen py-32 px-6 md:px-16 border-t border-white/10 relative z-20 pointer-events-none"
+      >
+        <div className="flex justify-between items-center mb-16 pointer-events-auto max-w-xl">
+          <div>
+            <span className="font-mono text-[10px] text-[#00f2fe] tracking-widest uppercase">
+              01 // DEPLOYED SUBSYSTEMS
+            </span>
+            <h2 className="text-3xl md:text-5xl font-black uppercase text-white tracking-tight mt-1">
+              PROVEN ENGINEERING
+            </h2>
+          </div>
+          <span className="font-mono text-[10px] text-slate-500 uppercase tracking-widest hidden sm:inline">
+            EXPLODED SPECIFICATION
           </span>
         </div>
-      </section>
 
-      {/* Section 002 / ABOUT */}
-      <section id="about" className="py-32 px-6 md:px-20 border-t border-white/5 relative z-10">
-        <div className="flex justify-between items-center mb-16">
-          <span className="section-label">002 / ABOUT</span>
-          <span className="section-accent">a bit of context</span>
-        </div>
-
-        <div className="max-w-3xl space-y-6 animate-up">
-          <p className="text-lg text-gray-300 leading-relaxed">
-            I'm a Finance major at UConn with a deep pull toward building things that work. From founding 180 Math LLC — scaling an ed-tech platform to 300+ students — to orchestrating autonomous AI agent pipelines, I operate at the boundary where quantitative thinking meets hands-on engineering.
-          </p>
-          <p className="text-base text-gray-400 leading-relaxed font-light">
-            Whether developing high-frequency habit algorithms, full-stack web architectures, or exploring autonomous agent toolchains, my focus remains constant: eliminate friction, scale impact, and build systems engineered to last.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
-            <div className="border border-white/10 p-6 bg-[var(--color-surface)]">
-              <div className="text-4xl md:text-5xl font-black text-white tracking-tight">300+</div>
-              <div className="font-mono text-[10px] text-gray-400 tracking-widest mt-2 uppercase">
-                STUDENTS REACHED
+        <div className="grid grid-cols-1 gap-12 max-w-xl pointer-events-auto">
+          {/* Card 1: 180 Math LLC */}
+          <div className="p-8 bg-[#0e1117]/90 border border-white/10 rounded-sm hover:border-[#00f2fe] transition-all duration-300 relative group overflow-hidden shadow-2xl backdrop-blur-md">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#00f2fe]"></span>
+                <span className="font-mono text-[10px] text-[#00f2fe] tracking-widest uppercase">
+                  CLUSTER 01 // ED-TECH ENGINE
+                </span>
               </div>
+              <span className="font-mono text-xs text-slate-400">2023–PRESENT</span>
             </div>
-            <div className="border border-white/10 p-6 bg-[var(--color-surface)]">
-              <div className="text-4xl md:text-5xl font-black text-white tracking-tight">6</div>
-              <div className="font-mono text-[10px] text-gray-400 tracking-widest mt-2 uppercase">
-                PINNED REPOS
-              </div>
+
+            <h3 className="text-3xl font-black uppercase text-white tracking-tight mb-2 group-hover:text-[#00f2fe] transition-colors">
+              180 MATH LLC
+            </h3>
+            <p className="text-sm text-slate-300 leading-relaxed mb-6 font-light">
+              Founder &amp; Lead Developer. Engineered an educational acceleration platform serving 300+ active students with sub-second question generation, interactive automated assessment workflows, and payment pipelines.
+            </p>
+
+            <div className="flex flex-wrap gap-2 font-mono text-[9px] uppercase text-slate-300 mb-6">
+              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-sm">Next.js</span>
+              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-sm">Supabase</span>
+              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-sm">Playwright</span>
+              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-sm">Data Pipelines</span>
             </div>
-            <div className="border border-white/10 p-6 bg-[var(--color-surface)]">
-              <div className="text-4xl md:text-5xl font-black text-white tracking-tight">618</div>
-              <div className="font-mono text-[10px] text-gray-400 tracking-widest mt-2 uppercase">
-                COMMITS/YR
+
+            <a
+              href="https://180math.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-xs font-mono font-bold text-[#00f2fe] hover:underline"
+            >
+              <span>ACCESS 180MATH.COM</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+
+          {/* Card 2: Quantitative Algorithmic Backtester */}
+          <div className="p-8 bg-[#0e1117]/90 border border-white/10 rounded-sm hover:border-[#10b981] transition-all duration-300 relative group overflow-hidden shadow-2xl backdrop-blur-md">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#10b981]"></span>
+                <span className="font-mono text-[10px] text-[#10b981] tracking-widest uppercase">
+                  CLUSTER 02 // QUANTITATIVE SIGNAL ENGINE
+                </span>
               </div>
+              <span className="font-mono text-xs text-slate-400">FINANCE '30</span>
+            </div>
+
+            <h3 className="text-3xl font-black uppercase text-white tracking-tight mb-2 group-hover:text-[#10b981] transition-colors">
+              ALGORITHMIC BACKTESTER
+            </h3>
+            <p className="text-sm text-slate-300 leading-relaxed mb-6 font-light">
+              High-frequency quantitative engine modeling VWAP reversion, volatility thresholds, and systematic alpha strategies against historical tick data with sub-millisecond local execution.
+            </p>
+
+            <div className="flex flex-wrap gap-2 font-mono text-[9px] uppercase text-slate-300 mb-6">
+              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-sm">Python</span>
+              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-sm">OpenBB</span>
+              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-sm">NumPy / Pandas</span>
+              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-sm">VWAP Modeling</span>
+            </div>
+
+            <div className="flex items-center gap-2 font-mono text-xs text-slate-400">
+              <TrendingUp className="w-3.5 h-3.5 text-[#10b981]" />
+              <span>Sharpe &amp; Calmar Ratio Optimization // Sub-second Analysis</span>
+            </div>
+          </div>
+
+          {/* Card 3: CAP Cosmic Radiation Telemetry */}
+          <div className="p-8 bg-[#0e1117]/90 border border-white/10 rounded-sm hover:border-[#00f2fe] transition-all duration-300 relative group overflow-hidden shadow-2xl backdrop-blur-md">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#00f2fe]"></span>
+                <span className="font-mono text-[10px] text-[#00f2fe] tracking-widest uppercase">
+                  CLUSTER 03 // AEROSPACE TELEMETRY
+                </span>
+              </div>
+              <span className="font-mono text-xs text-slate-400">NER-CT-071</span>
+            </div>
+
+            <h3 className="text-3xl font-black uppercase text-white tracking-tight mb-2 group-hover:text-[#00f2fe] transition-colors">
+              COSMIC RADIATION RESEARCH
+            </h3>
+            <p className="text-sm text-slate-300 leading-relaxed mb-6 font-light">
+              Cadet Chief Master Sgt &amp; Lead Payload Engineer. Directed High Altitude Balloon Challenge telemetry flights, parsing ionizing cosmic radiation flux data up to 100,000 feet altitude across 70+ cadets.
+            </p>
+
+            <div className="flex flex-wrap gap-2 font-mono text-[9px] uppercase text-slate-300 mb-6">
+              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-sm">Telemetry</span>
+              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-sm">Atmospheric Sensors</span>
+              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-sm">Radio Signals</span>
+              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-sm">Leadership</span>
+            </div>
+
+            <div className="flex items-center gap-2 font-mono text-xs text-slate-400">
+              <Radio className="w-3.5 h-3.5 text-[#00f2fe]" />
+              <span>Atmospheric Boundary Penetration: 98,420 FT AGL</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Section 003 / PROOF_OF_WORK */}
-      <section id="proof-of-work" className="py-32 border-t border-white/5 relative z-10">
-        <div className="flex justify-between items-center mb-16 px-6 md:px-20">
-          <span className="section-label">003 / PROOF_OF_WORK</span>
-          <span className="section-accent">showing up, most days</span>
-        </div>
-
-        <div className="animate-up flex flex-col md:flex-row justify-between mb-16 gap-8 px-6 md:px-20">
+      {/* ══════════════════════════════════════════════════════════════════
+          SYSTEMS ARSENAL (Section 003)
+          ══════════════════════════════════════════════════════════════════ */}
+      <section
+        id="arsenal"
+        className="py-32 px-6 md:px-16 border-t border-white/10 relative z-20 bg-[#070709]/95 backdrop-blur-md"
+      >
+        <div className="flex justify-between items-center mb-16 max-w-4xl">
           <div>
-            <h2 className="text-6xl md:text-8xl font-black tracking-tighter text-white">618</h2>
-            <p className="font-mono text-xs text-gray-400 tracking-widest mt-2 uppercase">COMMITS/YR</p>
+            <span className="font-mono text-[10px] text-[#10b981] tracking-widest uppercase">
+              03 // TECHNICAL ARSENAL
+            </span>
+            <h2 className="text-3xl md:text-5xl font-black uppercase text-white tracking-tight mt-1">
+              ENGINEERED TOOLCHAIN
+            </h2>
           </div>
-          <div>
-            <h2 className="text-6xl md:text-8xl font-black tracking-tighter text-white">42</h2>
-            <p className="font-mono text-xs text-gray-400 tracking-widest mt-2 uppercase">LONGEST STREAK</p>
-          </div>
-          <div>
-            <h2 className="text-6xl md:text-8xl font-black tracking-tighter text-white">8</h2>
-            <p className="font-mono text-xs text-gray-400 tracking-widest mt-2 uppercase">CURRENT STREAK</p>
-          </div>
+          <span className="font-mono text-[10px] text-slate-500 uppercase tracking-widest hidden sm:inline">
+            CORE CAPABILITIES
+          </span>
         </div>
 
-        {/* GitHub contribution heatmap grid */}
-        <ContributionHeatmap />
-      </section>
-
-      {/* Section 004 / TOOLKIT */}
-      <section id="toolkit" className="py-32 px-6 md:px-20 border-t border-white/5 relative z-10">
-        <div className="flex justify-between items-center mb-16">
-          <span className="section-label">004 / TOOLKIT</span>
-          <span className="section-accent">tools I reach for</span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-white/10 bg-[var(--color-surface)] animate-up">
-          {/* Languages */}
-          <div className="p-8 border-b md:border-r border-white/10 group relative overflow-hidden hover:box-glow-cyan transition-all duration-300">
-            <div className="absolute -right-8 -top-8 w-28 h-28 opacity-15 pointer-events-none">
-              <Mini3DNode color="#00f3ff" />
-            </div>
-            <div className="flex justify-between items-start mb-6 relative z-10">
-              <h3 className="text-xl font-black uppercase tracking-tight text-white">Languages</h3>
-              <span className="font-mono text-[9px] text-[var(--color-neon-cyan)]">01</span>
-            </div>
-            <p className="text-xs text-gray-400 font-calligraphy mb-6 relative z-10 leading-relaxed">
-              Core syntaxes for modeling, architecture, and systems engineering.
-            </p>
-            <div className="flex flex-wrap gap-2 relative z-10">
-              {['Python', 'TypeScript', 'JavaScript', 'SQL', 'HTML', 'CSS', 'C'].map((skill) => (
-                <span key={skill} className="skill-pill">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Frontend */}
-          <div className="p-8 border-b md:border-r border-white/10 group relative overflow-hidden hover:box-glow-cyan transition-all duration-300">
-            <div className="flex justify-between items-start mb-6 relative z-10">
-              <h3 className="text-xl font-black uppercase tracking-tight text-white">Frontend</h3>
-              <span className="font-mono text-[9px] text-[var(--color-neon-cyan)]">02</span>
-            </div>
-            <p className="text-xs text-gray-400 font-calligraphy mb-6 relative z-10 leading-relaxed">
-              Responsive web interfaces crafted for speed, modularity, and motion fidelity.
-            </p>
-            <div className="flex flex-wrap gap-2 relative z-10">
-              {['React', 'Next.js', 'Tailwind CSS', 'GSAP'].map((skill) => (
-                <span key={skill} className="skill-pill">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* AI / ML */}
-          <div className="p-8 border-b border-white/10 group relative overflow-hidden hover:box-glow-cyan hover-lift transition-all duration-300">
-            <div className="absolute -right-8 -top-8 w-28 h-28 opacity-15 pointer-events-none">
-              <Mini3DNode color="#b026ff" />
-            </div>
-            <div className="flex justify-between items-start mb-6 relative z-10">
-              <h3 className="text-xl font-black uppercase tracking-tight text-white">AI / ML</h3>
-              <span className="font-mono text-[9px] text-[var(--color-neon-cyan)]">03</span>
-            </div>
-            <p className="text-xs text-gray-400 font-calligraphy mb-6 relative z-10 leading-relaxed">
-              Orchestrating autonomous agents, context retrieval, and model integrations.
-            </p>
-            <div className="flex flex-wrap gap-2 relative z-10">
-              {['Agentic AI', 'MCP', 'LLMs', 'Gemini', 'RAG', 'Embeddings'].map((skill) => (
-                <span key={skill} className="skill-pill">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Data */}
-          <div className="p-8 border-b md:border-b-0 md:border-r border-white/10 group relative overflow-hidden hover:box-glow-cyan transition-all duration-300">
-            <div className="flex justify-between items-start mb-6 relative z-10">
-              <h3 className="text-xl font-black uppercase tracking-tight text-white">Data</h3>
-              <span className="font-mono text-[9px] text-[var(--color-neon-cyan)]">04</span>
-            </div>
-            <p className="text-xs text-gray-400 font-calligraphy mb-6 relative z-10 leading-relaxed">
-              Persistent relational databases, caching layers, and scalable cloud backends.
-            </p>
-            <div className="flex flex-wrap gap-2 relative z-10">
-              {['Supabase', 'PostgreSQL', 'MongoDB', 'Redis'].map((skill) => (
-                <span key={skill} className="skill-pill">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Platform */}
-          <div className="p-8 border-b md:border-b-0 md:border-r border-white/10 group relative overflow-hidden hover:box-glow-cyan transition-all duration-300">
-            <div className="flex justify-between items-start mb-6 relative z-10">
-              <h3 className="text-xl font-black uppercase tracking-tight text-white">Platform</h3>
-              <span className="font-mono text-[9px] text-[var(--color-neon-cyan)]">05</span>
-            </div>
-            <p className="text-xs text-gray-400 font-calligraphy mb-6 relative z-10 leading-relaxed">
-              Production development lifecycle, automated testing, and CI/CD pipelines.
-            </p>
-            <div className="flex flex-wrap gap-2 relative z-10">
-              {['Git', 'GitHub', 'Playwright', 'CI/CD'].map((skill) => (
-                <span key={skill} className="skill-pill">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Automation */}
-          <div className="p-8 group relative overflow-hidden hover:box-glow-cyan transition-all duration-300">
-            <div className="flex justify-between items-start mb-6 relative z-10">
-              <h3 className="text-xl font-black uppercase tracking-tight text-white">Automation</h3>
-              <span className="font-mono text-[9px] text-[var(--color-neon-cyan)]">06</span>
-            </div>
-            <p className="text-xs text-gray-400 font-calligraphy mb-6 relative z-10 leading-relaxed">
-              Programmatic rendering workflows, browser scraping, and external API pipelines.
-            </p>
-            <div className="flex flex-wrap gap-2 relative z-10">
-              {['Remotion', 'YouTube API', 'Puppeteer'].map((skill) => (
-                <span key={skill} className="skill-pill">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 005 / EXPERIENCE */}
-      <section id="experience" className="py-32 px-6 md:px-20 border-t border-white/5 relative z-10">
-        <div className="flex justify-between items-center mb-16">
-          <span className="section-label">005 / EXPERIENCE</span>
-          <span className="section-accent">the route so far</span>
-        </div>
-
-        <div className="space-y-8 animate-up">
-          {/* Card 1: 180 MATH LLC */}
-          <div className="w-full bg-[#f4f4f0] text-[#0a0a0a] rounded-sm p-8 md:p-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-r from-black/[0.02] to-black/[0.08] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-            <div className="max-w-2xl z-10">
-              <h3 className="text-5xl md:text-7xl font-black tracking-tighter uppercase mb-4 text-[#0a0a0a]">
-                180 MATH LLC
-              </h3>
-              <p className="font-calligraphy text-base md:text-lg text-gray-700 mb-6 leading-relaxed">
-                Scaled an online math resource platform to 300+ students. Built automated workflows using Playwright and orchestrated data pipelines.
-              </p>
-              <div className="flex items-center gap-4 font-mono text-[9px] tracking-widest uppercase text-gray-800">
-                <span className="font-bold">FOUNDER &amp; LEAD DEVELOPER</span>
-                <span className="text-gray-400">|</span>
-                <span>Storrs, CT</span>
-              </div>
-            </div>
-            <div className="z-10 flex flex-col items-start md:items-end gap-6 shrink-0">
-              <span className="text-3xl md:text-4xl font-bold text-[#0a0a0a] tracking-tight">
-                2023–Present
-              </span>
-              <div className="flex flex-wrap gap-2 font-mono text-[8px] uppercase">
-                <span className="border border-black/25 px-3 py-1 rounded-sm text-black font-semibold">
-                  Next.js
-                </span>
-                <span className="border border-black/25 px-3 py-1 rounded-sm text-black font-semibold">
-                  Supabase
-                </span>
-                <span className="border border-black/25 px-3 py-1 rounded-sm text-black font-semibold">
-                  Playwright
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 2: CIVIL AIR PATROL */}
-          <div className="w-full bg-[var(--color-surface)] border border-white/10 text-white rounded-sm p-8 md:p-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-neon-purple)]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-            <div className="max-w-2xl z-10">
-              <h3 className="text-5xl md:text-7xl font-black tracking-tighter uppercase mb-4 text-white">
-                CIVIL AIR PATROL
-              </h3>
-              <p className="font-calligraphy text-base md:text-lg text-gray-400 mb-6 leading-relaxed">
-                Led a team of 70+ cadets and directed the High Altitude Balloon Challenge research team, analyzing high-altitude telemetry data.
-              </p>
-              <div className="flex items-center gap-4 font-mono text-[9px] tracking-widest uppercase">
-                <span className="font-bold text-[var(--color-neon-purple)]">
-                  CADET CHIEF MASTER SGT
-                </span>
-                <span className="text-gray-600">|</span>
-                <span className="text-gray-400">NER-CT-071</span>
-              </div>
-            </div>
-            <div className="z-10 flex flex-col items-start md:items-end gap-6 shrink-0">
-              <span className="text-3xl md:text-4xl font-bold text-[var(--color-neon-purple)] tracking-tight">
-                2020–2024
-              </span>
-              <div className="flex flex-wrap gap-2 font-mono text-[8px] uppercase">
-                <span className="border border-white/20 px-3 py-1 rounded-sm text-gray-300">
-                  Leadership
-                </span>
-                <span className="border border-white/20 px-3 py-1 rounded-sm text-gray-300">
-                  Research
-                </span>
-                <span className="border border-white/20 px-3 py-1 rounded-sm text-gray-300">
-                  Telemetry
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 006 / WORK */}
-      <section id="work" className="py-32 px-6 md:px-20 border-t border-white/5 relative z-10">
-        <div className="flex justify-between items-center mb-16">
-          <span className="section-label">006 / WORK</span>
-          <span className="section-accent">pinned repositories</span>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-up">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl">
           {[
             {
-              name: 'antigravity-mobile-ide',
-              desc: 'Mobile-first PWA for orchestrating autonomous AI agent workflows',
-              lang: 'JavaScript',
-              color: '#f1e05a',
+              title: 'LANGUAGES',
+              icon: <TerminalIcon className="w-4 h-4 text-[#00f2fe]" />,
+              items: ['Python', 'C', 'JavaScript', 'TypeScript', 'SQL', 'HTML/CSS'],
             },
             {
-              name: 'faceless-video-pipeline',
-              desc: 'Programmatic video generation pipeline with Remotion and Gemini API',
-              lang: 'JavaScript',
-              color: '#f1e05a',
+              title: 'QUANT & SYSTEMS',
+              icon: <Activity className="w-4 h-4 text-[#10b981]" />,
+              items: ['OpenBB', 'VWAP Models', 'Pandas / NumPy', 'Algorithmic Trading', 'Time-Series Analysis'],
             },
             {
-              name: '180math',
-              desc: 'Full-stack educational platform with interactive quiz engines and payments',
-              lang: 'HTML',
-              color: '#e34c26',
+              title: 'ARCHITECTURE & WEB',
+              icon: <Layers className="w-4 h-4 text-[#00f2fe]" />,
+              items: ['React 19', 'Next.js', 'Tailwind CSS', 'Three.js / WebGL', 'Supabase'],
             },
             {
-              name: 'habit-tracker-pwa',
-              desc: 'Schema-driven daily habit tracking with offline sync',
-              lang: 'TypeScript',
-              color: '#3178c6',
+              title: 'INFRA & AUTOMATION',
+              icon: <Cpu className="w-4 h-4 text-[#10b981]" />,
+              items: ['Docker', 'Git / GitHub', 'Playwright', 'Linux / macOS CLI', 'MCP Protocols'],
             },
-            {
-              name: 'routine-streak-pwa',
-              desc: 'Performance optimizer using bitmask arithmetic for routine tracking',
-              lang: 'JavaScript',
-              color: '#f1e05a',
-            },
-            {
-              name: 'supercommunicators-app',
-              desc: 'NLP-powered communication psychology analyzer',
-              lang: 'Python',
-              color: '#3572A5',
-            },
-          ].map((repo) => (
+          ].map((cat, idx) => (
             <div
-              key={repo.name}
-              className="border border-white/10 bg-[var(--color-surface)] p-6 hover:box-glow-cyan hover-lift transition-all duration-300 flex flex-col group"
+              key={idx}
+              className="p-6 bg-[#0e1117] border border-white/10 rounded-sm hover:border-white/30 transition-all"
             >
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-5 h-5 bg-white/10 rounded-sm flex items-center justify-center shrink-0">
-                  <svg className="w-3.5 h-3.5 text-gray-400" fill="currentColor" viewBox="0 0 16 16">
-                    <path
-                      fillRule="evenodd"
-                      d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25 0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"
-                    />
-                  </svg>
-                </div>
-                <a
-                  href={`https://github.com/rohankosur/${repo.name}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-bold text-[var(--color-neon-cyan)] hover:underline text-sm truncate"
-                >
-                  {repo.name}
-                </a>
-                <span className="ml-auto border border-white/20 text-gray-400 text-[9px] px-1.5 py-0.5 rounded-full font-mono">
-                  Public
-                </span>
+              <div className="flex items-center gap-2 mb-4 font-mono text-xs font-bold text-white tracking-wider">
+                {cat.icon}
+                <span>{cat.title}</span>
               </div>
-              <p className="text-xs text-gray-400 mb-6 font-calligraphy flex-grow leading-relaxed">
-                {repo.desc}
-              </p>
-              <div className="flex items-center gap-2 font-mono text-[10px] text-gray-400 mt-auto">
-                <span
-                  className="w-2.5 h-2.5 rounded-full inline-block"
-                  style={{ backgroundColor: repo.color }}
-                />
-                <span>{repo.lang}</span>
-              </div>
+              <ul className="space-y-2 font-mono text-[11px] text-slate-400">
+                {cat.items.map((item, i) => (
+                  <li key={i} className="flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-slate-600"></span>
+                    <span className="hover:text-[#00f2fe] transition-colors">{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Section 007 / OFF-SCREEN */}
-      <section id="off-screen" className="py-32 px-6 md:px-20 border-t border-white/5 relative z-10 overflow-hidden">
-        <div className="px-6 md:px-20 flex justify-between items-center mb-16">
-          <span className="section-label">007 / OFF-SCREEN</span>
-          <span className="section-accent">life beyond the editor</span>
-        </div>
-
-        <div className="flex gap-6 px-6 md:px-20 overflow-x-auto pb-8 snap-x w-full">
-          {/* Item 1 */}
-          <div className="min-w-[80vw] md:min-w-[40vw] h-[50vh] relative bg-[#111] border border-white/10 shrink-0 snap-center group overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1522252234503-e356532cafd5?auto=format&fit=crop&q=80&w=1200"
-              alt="Coding setup"
-              className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-300"
-            />
-            <div className="absolute bottom-4 left-4 font-mono text-[9px] uppercase tracking-widest bg-black/60 px-2.5 py-1 backdrop-blur-sm border border-white/10 text-gray-300">
-              01/LATE NIGHTS
+      {/* ══════════════════════════════════════════════════════════════════
+          FOOTER / CONNECT TERMINAL (Section 004)
+          ══════════════════════════════════════════════════════════════════ */}
+      <footer
+        id="contact"
+        className="py-20 px-6 md:px-16 border-t border-white/10 font-mono text-xs text-slate-400 relative z-20 bg-[#070709]"
+      >
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 max-w-5xl">
+          <div>
+            <div className="flex items-center gap-2 text-white font-bold tracking-widest text-sm mb-2">
+              <ShieldCheck className="w-4 h-4 text-[#00f2fe]" />
+              <span>/SYS/SESSION.NOMINAL</span>
             </div>
+            <p className="text-slate-500">
+              High-Altitude Atmospheric Terminal v2.4 // Engineered for Rohan Kosur
+            </p>
           </div>
 
-          {/* Item 2 */}
-          <div className="min-w-[80vw] md:min-w-[40vw] h-[50vh] relative bg-[#111] border border-white/10 shrink-0 snap-center group overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&q=80&w=1200"
-              alt="Climbing"
-              className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-300"
-            />
-            <div className="absolute bottom-4 left-4 font-mono text-[9px] uppercase tracking-widest bg-black/60 px-2.5 py-1 backdrop-blur-sm border border-white/10 text-gray-300">
-              02/EXPLORATION
-            </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+            <a
+              href="mailto:contact@rohankosur.com"
+              className="px-6 py-3 rounded-sm bg-[#00f2fe] text-black font-bold tracking-wider hover:bg-[#10b981] transition-all shadow-[0_0_15px_rgba(0,242,254,0.3)]"
+            >
+              ESTABLISH CONNECTION
+            </a>
+            <p className="text-[10px] text-slate-600 uppercase tracking-widest">
+              &copy; {CURRENT_YEAR} ROHAN KOSUR.
+            </p>
           </div>
-
-          {/* Item 3 */}
-          <div className="min-w-[80vw] md:min-w-[40vw] h-[50vh] relative bg-[#111] border border-white/10 shrink-0 snap-center group overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=1200"
-              alt="Retro tech"
-              className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-300"
-            />
-            <div className="absolute bottom-4 left-4 font-mono text-[9px] uppercase tracking-widest bg-black/60 px-2.5 py-1 backdrop-blur-sm border border-white/10 text-gray-300">
-              03/GAME THEORY
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-20 px-6 md:px-20 border-t border-white/10 font-mono text-xs text-gray-500 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-        <div>
-          <p className="text-white mb-2 font-bold tracking-widest text-sm">/SYS/LOGS/SESSION.END</p>
-          <p className="text-gray-400">All systems nominal.</p>
-        </div>
-        <div className="md:text-right">
-          <a
-            href="mailto:contact@rohankosur.com"
-            className="text-[var(--color-neon-cyan)] hover:text-white transition-colors underline decoration-[var(--color-neon-cyan)]/40 underline-offset-4 tracking-wider text-sm font-semibold"
-          >
-            ESTABLISH CONNECTION
-          </a>
-          <p className="mt-4 text-[9px] uppercase tracking-widest text-gray-600">
-            &copy; {CURRENT_YEAR} ROHAN KOSUR.
-          </p>
         </div>
       </footer>
-
-      {/* Global CSS for Marquee */}
-      <style>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-      `}</style>
     </div>
   );
 }
-
-export default App;
